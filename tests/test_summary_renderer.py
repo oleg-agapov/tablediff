@@ -4,7 +4,7 @@ import duckdb
 import pytest
 
 from tablediff.adapters.duckdb import DuckDBAdapter
-from tablediff.engine import diff_tables
+from tablediff.diffing import diff_tables
 from tablediff.renderers.summary import render_summary
 
 
@@ -25,4 +25,3 @@ def test_summary_output(tmp_path: pytest.TempPathFactory) -> None:
     assert "Primary key: id" in output
     assert "Rows only in A: 0" in output
     assert "Rows in both (same): 1" in output
-

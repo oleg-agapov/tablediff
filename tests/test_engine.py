@@ -4,7 +4,7 @@ import duckdb
 import pytest
 
 from tablediff.adapters.duckdb import DuckDBAdapter
-from tablediff.engine import DiffError, diff_tables
+from tablediff.diffing import DiffError, diff_tables
 
 
 def _create_tables(conn: duckdb.DuckDBPyConnection) -> None:
@@ -73,4 +73,3 @@ def test_duplicate_pk_validation(tmp_path: pytest.TempPathFactory) -> None:
     adapter = DuckDBAdapter(str(db_path))
     with pytest.raises(DiffError, match="duplicate primary key"):
         diff_tables(adapter, "a", "b", "id")
-

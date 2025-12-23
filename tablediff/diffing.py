@@ -1,26 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Iterable
 
 from tablediff.adapters.base import Adapter, TableMeta
-
-
-@dataclass(frozen=True)
-class DiffCounts:
-    only_in_a: int
-    only_in_b: int
-    in_both_same: int
-    in_both_diff: int
-
-
-@dataclass(frozen=True)
-class DiffResult:
-    table_a: TableMeta
-    table_b: TableMeta
-    primary_key: str
-    common_columns: list[str]
-    counts: DiffCounts
+from tablediff.models import DiffCounts, DiffResult
 
 
 class DiffError(ValueError):
@@ -80,4 +63,3 @@ def diff_tables(adapter: Adapter, table_a: str, table_b: str, pk: str) -> DiffRe
         common_columns=common_columns,
         counts=counts,
     )
-

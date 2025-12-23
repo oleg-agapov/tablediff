@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from tablediff.engine import DiffResult
+from tablediff.models import DiffResult
 
 
 def render_summary(result: DiffResult) -> str:

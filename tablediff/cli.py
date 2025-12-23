@@ -3,8 +3,8 @@ from __future__ import annotations
 import argparse
 import sys
 
-from tablediff.adapters.duckdb import DuckDBAdapter
-from tablediff.engine import DiffError, diff_tables
+from tablediff.adapters.default import DefaultAdapter
+from tablediff.diffing import DiffError, diff_tables
 from tablediff.examples import generate_example_database
 from tablediff.renderers.summary import render_summary
 
@@ -60,7 +60,7 @@ def main() -> None:
     args = parser.parse_args()
 
     try:
-        adapter = DuckDBAdapter(args.db)
+        adapter = DefaultAdapter(args.db)
         result = diff_tables(adapter, args.table_a, args.table_b, args.pk)
     except DiffError as exc:
         print(f"Error: {exc}", file=sys.stderr)
