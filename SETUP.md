@@ -41,7 +41,7 @@ git remote add origin https://github.com/oleg-agapov/tablediff.git
 git push -u origin main
 ```
 
-**Note:** If you've already initialized this repository with a README or LICENSE file, you may need to pull first:
+**Note:** If the GitHub repository already contains files (like README or LICENSE), you may need to pull first:
 
 ```bash
 git pull origin main --allow-unrelated-histories
