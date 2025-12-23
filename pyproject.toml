@@ -1,0 +1,20 @@
+[project]
+name = "tablediff"
+version = "0.1.0"
+description = "CLI tool for data diffing between two tables"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "duckdb",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+]
+
+[project.scripts]
+tablediff = "tablediff.cli:main"
+
+[tool.uv]
+package = true
