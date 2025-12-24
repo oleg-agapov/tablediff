@@ -4,7 +4,7 @@ import argparse
 import sys
 
 from tablediff.adapters.default import DefaultAdapter
-from tablediff.diffing import DiffError, diff_tables
+from tablediff.engine import DiffError, diff_tables
 from tablediff.renderers.summary import render_summary
 
 

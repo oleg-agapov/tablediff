@@ -4,7 +4,7 @@ import duckdb
 import pytest
 
 from tablediff.adapters.duckdb import DuckDBAdapter
-from tablediff.diffing import DiffError, diff_tables
+from tablediff.engine import DiffError, diff_tables
 
 
 def _create_tables(conn: duckdb.DuckDBPyConnection) -> None:

@@ -4,7 +4,7 @@ import duckdb
 import pytest
 
 from tablediff.adapters.duckdb import DuckDBAdapter
-from tablediff.diffing import diff_tables
+from tablediff.engine import diff_tables
 from tablediff.renderers.summary import render_summary
 
 
