@@ -11,8 +11,14 @@ def _quote_ident(name: str) -> str:
 
 
 class DuckDBAdapter:
-    def __init__(self, database_path: str) -> None:
-        self._conn = duckdb.connect(database_path, read_only=True)
+    def __init__(self, database: str | duckdb.DuckDBPyConnection) -> None:
+        if isinstance(database, str):
+            if database == ":memory:":
+                self._conn = duckdb.connect(database)
+            else:
+                self._conn = duckdb.connect(database, read_only=True)
+        else:
+            self._conn = database
 
     def get_columns(self, table: str) -> list[str]:
         query = f"PRAGMA table_info({_quote_ident(table)})"
@@ -61,4 +67,3 @@ class DuckDBAdapter:
             "in_both_same": int(row[2]),
             "in_both_diff": int(row[3]),
         }
-
