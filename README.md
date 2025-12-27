@@ -20,3 +20,11 @@ tablediff generate-example
 # Run table diffing
 tablediff table_a table_b --pk id --db data/example.duckdb
 ```
+
+## Generating sample DuckDB for local testing
+
+To generate local DuckDB database with the same cases as in /tests run:
+
+```bash
+python generate-sample.py --db-path sample.duckdb
+```
