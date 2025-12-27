@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+from rich import box
+from rich.table import Table
+from rich.panel import Panel
+from rich.console import Console
+
 from tablediff.models import DiffResult
 
 
@@ -34,3 +39,33 @@ def render_summary(result: DiffResult) -> str:
         "",
     ]
     return "\n".join(lines)
+
+
+def render_summary_rich(result: DiffResult) -> None:
+    only_in_a = sorted(set(result.table_a.columns) - set(result.table_b.columns))
+    only_in_b = sorted(set(result.table_b.columns) - set(result.table_a.columns))
+    common = result.common_columns
+
+    console = Console()
+    console.print()
+    
+    #console.print(Panel.fit(f"🔑 Primary key: {result.primary_key}", padding=(0, 2)))
+
+    table = Table(show_header=True, padding=(0, 2), box=box.MINIMAL)
+    table.add_column("Metric")
+    table.add_column(result.table_a.name, justify="right")
+    table.add_column(result.table_b.name, justify="right")
+
+    table.add_row("Columns total", str(len(result.table_a.columns)), str(len(result.table_b.columns)))
+    table.add_row("⚠️  Columns only", str(len(only_in_a)), str(len(only_in_b)))
+
+    table.add_row("✅ Columns common", str(len(common)))
+    table.add_row("", end_section=True)
+    
+    table.add_row("Rows total", str(result.table_a.row_count), str(result.table_b.row_count))
+    table.add_row("⚠️  Rows only", str(result.counts.only_in_a), str(result.counts.only_in_b))
+    table.add_row("✅ Rows in both (same)", str(result.counts.in_both_same))
+    table.add_row("⚠️  Rows in both (diff)", str(result.counts.in_both_diff))
+    
+    console.print(Panel.fit(table, padding=(1, 2), title="🔎 Data diff summary"))
+    console.print()

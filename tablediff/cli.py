@@ -4,7 +4,7 @@ import argparse
 
 from tablediff.adapters.default import DefaultAdapter
 from tablediff.engine import diff_tables
-from tablediff.renderers.summary import render_summary
+from tablediff.renderers.summary import render_summary_rich
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -27,7 +27,7 @@ def main() -> None:
 
     adapter = DefaultAdapter(args.conn)
     result = diff_tables(adapter, args.table_a, args.table_b, args.pk)
-    print(render_summary(result))
+    render_summary_rich(result)
 
 
 if __name__ == "__main__":

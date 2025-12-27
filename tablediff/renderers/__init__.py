@@ -1,4 +1,3 @@
-__all__ = ["render_summary"]
+__all__ = ["render_summary", "render_summary_rich"]
 
-from tablediff.renderers.summary import render_summary
-
+from tablediff.renderers.summary import render_summary_rich, render_summary
