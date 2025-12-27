@@ -20,14 +20,21 @@ class DuckDBAdapter:
         else:
             self._conn = database
 
+    def run_sql(self, statement: str) -> list[tuple]:
+        return self._conn.execute(statement).fetchall()
+
+    def run_statements(self, statements: Iterable[str]) -> None:
+        for statement in statements:
+            self.run_sql(statement)
+
     def get_columns(self, table: str) -> list[str]:
         query = f"PRAGMA table_info({_quote_ident(table)})"
-        rows = self._conn.execute(query).fetchall()
+        rows = self.run_sql(query)
         return [row[1] for row in rows]
 
     def count_rows(self, table: str) -> int:
         query = f"SELECT COUNT(*) FROM {_quote_ident(table)}"
-        return int(self._conn.execute(query).fetchone()[0])
+        return int(self.run_sql(query)[0][0])
 
     def count_duplicate_pks(self, table: str, pk: str) -> int:
         query = f"""
@@ -38,7 +45,7 @@ class DuckDBAdapter:
                 HAVING COUNT(*) > 1
             ) dup
         """
-        return int(self._conn.execute(query).fetchone()[0])
+        return int(self.run_sql(query)[0][0])
 
     def diff_counts(
         self, table_a: str, table_b: str, pk: str, common_columns: Iterable[str]
@@ -60,7 +67,7 @@ class DuckDBAdapter:
             FULL OUTER JOIN {_quote_ident(table_b)} AS b
             ON a.{pk_q} = b.{pk_q}
         """
-        row = self._conn.execute(query).fetchone()
+        row = self.run_sql(query)[0]
         return {
             "only_in_a": int(row[0]),
             "only_in_b": int(row[1]),

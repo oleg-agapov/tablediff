@@ -7,9 +7,9 @@ import pytest
 
 from tablediff.adapters.duckdb import DuckDBAdapter
 
-_AB_TABLE_STATEMENTS = [
+SAMPLE_DB_STATEMENTS = [
     """
-    CREATE TABLE a (
+    CREATE TABLE table_a (
         id INTEGER,
         name TEXT,
         value INTEGER,
@@ -17,7 +17,7 @@ _AB_TABLE_STATEMENTS = [
     )
     """,
     """
-    CREATE TABLE b (
+    CREATE TABLE table_b (
         id INTEGER,
         name TEXT,
         value INTEGER,
@@ -25,7 +25,7 @@ _AB_TABLE_STATEMENTS = [
     )
     """,
     """
-    INSERT INTO a VALUES
+    INSERT INTO table_a VALUES
         (1, 'alpha', 10, 1),
         (2, 'beta', 20, 1),
         (3, 'gamma', 30, 1),
@@ -33,7 +33,7 @@ _AB_TABLE_STATEMENTS = [
         (6, 'theta', null, 1)
     """,
     """
-    INSERT INTO b VALUES
+    INSERT INTO table_b VALUES
         (1, 'alpha', 10, 'aa'),
         (2, 'beta', 25, 'aa'),
         (4, 'delta', 40, 'aa'),
@@ -56,4 +56,4 @@ def duckdb_adapter() -> Callable[[Iterable[str]], DuckDBAdapter]:
 
 @pytest.fixture
 def duckdb_ab_adapter(duckdb_adapter: Callable[[Iterable[str]], DuckDBAdapter]) -> DuckDBAdapter:
-    return duckdb_adapter(_AB_TABLE_STATEMENTS)
+    return duckdb_adapter(SAMPLE_DB_STATEMENTS)

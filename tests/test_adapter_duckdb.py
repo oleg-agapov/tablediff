@@ -6,12 +6,12 @@ from tablediff.adapters.duckdb import DuckDBAdapter
 
 def test_get_columns(duckdb_ab_adapter: DuckDBAdapter) -> None:
     adapter = duckdb_ab_adapter
-    assert adapter.get_columns("a") == ["id", "name", "value", "col_in_a"]
+    assert adapter.get_columns("table_a") == ["id", "name", "value", "col_in_a"]
 
 
 def test_count_rows(duckdb_ab_adapter: DuckDBAdapter) -> None:
     adapter = duckdb_ab_adapter
-    assert adapter.count_rows("a") == 5
+    assert adapter.count_rows("table_a") == 5
 
 
 def test_count_duplicate_pks(
@@ -30,7 +30,7 @@ def test_count_duplicate_pks(
 def test_diff_counts(duckdb_ab_adapter: DuckDBAdapter) -> None:
     adapter = duckdb_ab_adapter
 
-    result = adapter.diff_counts("a", "b", "id", ["name", "value"])
+    result = adapter.diff_counts("table_a", "table_b", "id", ["name", "value"])
 
     assert result == {
         "only_in_a": 1,
