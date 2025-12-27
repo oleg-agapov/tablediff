@@ -12,29 +12,33 @@ _AB_TABLE_STATEMENTS = [
     CREATE TABLE a (
         id INTEGER,
         name TEXT,
-        value INTEGER
+        value INTEGER,
+        col_in_a INTEGER
     )
     """,
     """
     CREATE TABLE b (
         id INTEGER,
         name TEXT,
-        value INTEGER
+        value INTEGER,
+        col_in_b TEXT
     )
     """,
     """
     INSERT INTO a VALUES
-        (1, 'alpha', 10),
-        (2, 'beta', 20),
-        (3, 'gamma', 30),
-        (5, 'epsilon', 50)
+        (1, 'alpha', 10, 1),
+        (2, 'beta', 20, 1),
+        (3, 'gamma', 30, 1),
+        (5, 'epsilon', 50, 1),
+        (6, 'theta', null, 1)
     """,
     """
     INSERT INTO b VALUES
-        (1, 'alpha', 10),
-        (2, 'beta', 25),
-        (4, 'delta', 40),
-        (5, 'epsilon', 50)
+        (1, 'alpha', 10, 'aa'),
+        (2, 'beta', 25, 'aa'),
+        (4, 'delta', 40, 'aa'),
+        (5, 'epsilon', 50, 'aa'),
+        (6, 'theta', 60, 1)
     """,
 ]
 

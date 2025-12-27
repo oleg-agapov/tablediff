@@ -13,7 +13,7 @@ def test_diff_counts(duckdb_ab_adapter: DuckDBAdapter) -> None:
     assert result.counts.only_in_a == 1
     assert result.counts.only_in_b == 1
     assert result.counts.in_both_same == 2
-    assert result.counts.in_both_diff == 1
+    assert result.counts.in_both_diff == 2
 
 
 def test_duplicate_pk_validation(
