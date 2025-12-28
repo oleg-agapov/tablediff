@@ -9,5 +9,5 @@ __pycache__/
 *.egg-info/
 *.egg
 
-example.duckdb
 sample.duckdb
+profiles.yml

@@ -7,6 +7,8 @@ requires-python = ">=3.10"
 dependencies = [
   "duckdb",
   "rich>=14.2.0",
+  "PyYAML",
+  "snowflake-connector-python[secure-local-storage]",
 ]
 
 [project.optional-dependencies]

@@ -5,20 +5,17 @@ CLI tool for data diffing between two tables
 
 ```bash
 # Setup virtual environment
-uv venv .venv
+uv sync --extra dev
 source .venv/bin/activate
-
-# Install dev dependencies
-uv pip install -e ".[dev]"
 
 # Run tests
 pytest
 
-# Create sample database
-tablediff generate-example
+# Run table diffing (DuckDB)
+tablediff table_a table_b --pk id --adapter duckdb --conn sample.duckdb
 
-# Run table diffing
-tablediff table_a table_b --pk id --db data/example.duckdb
+# Run table diffing (Snowflake, reads credentials from .env and profiles.yml)
+tablediff ANALYTICS.TABLE_A ANALYTICS.TABLE_B --pk ID --adapter snowflake --profile dbt_analytics --target dev
 ```
 
 ## Generating sample DuckDB for local testing
