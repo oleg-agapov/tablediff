@@ -25,3 +25,20 @@ To generate local DuckDB database with the same cases as in /tests run:
 ```bash
 python generate-sample.py --db-path sample.duckdb
 ```
+
+Alternatively, use Python scripts:
+
+```
+python scripts/generate_duckdb_test_data.py \
+  --db-path sample.duckdb \
+  --prod-rows 23753 \
+  --dev-remove-rows 342 \
+  --dev-add-rows 30 \
+  --dev-null-status-rows 578
+```
+
+And then:
+
+```
+tablediff users_dev users_prod --pk id --adapter duckdb --conn sample.duckdb
+```
