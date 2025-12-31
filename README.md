@@ -12,10 +12,7 @@ source .venv/bin/activate
 pytest
 
 # Run table diffing (DuckDB)
-tablediff table_a table_b --pk id --adapter duckdb --conn sample.duckdb
-
-# Run table diffing (Snowflake, reads credentials from .env and profiles.yml)
-tablediff ANALYTICS.TABLE_A ANALYTICS.TABLE_B --pk ID --adapter snowflake --profile dbt_analytics --target dev
+tablediff table_a table_b --pk id --conn duckdb://./sample.duckdb
 ```
 
 ## Generating sample DuckDB for local testing
@@ -40,5 +37,5 @@ python scripts/generate_duckdb_test_data.py \
 And then:
 
 ```
-tablediff users_dev users_prod --pk id --adapter duckdb --conn sample.duckdb
+tablediff users_dev users_prod --pk id --conn duckdb://./sample.duckdb
 ```

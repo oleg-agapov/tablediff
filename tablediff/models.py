@@ -1,17 +1,12 @@
 from __future__ import annotations
-
 from dataclasses import dataclass
-
-from tablediff.adapters.base import TableMeta
-
+from reladiff.diff_tables import DiffResultWrapper
 
 @dataclass(frozen=True)
-class DiffCounts:
-    only_in_a: int
-    only_in_b: int
-    in_both_same: int
-    in_both_diff: int
-
+class TableMeta:
+    name: str
+    columns: list[str]
+    rows: int
 
 @dataclass(frozen=True)
 class DiffResult:
@@ -19,4 +14,10 @@ class DiffResult:
     table_b: TableMeta
     primary_key: str
     common_columns: list[str]
-    counts: DiffCounts
+    rows_only_in_a: int
+    rows_only_in_b: int
+    rows_in_both_same: int
+    rows_in_both_diff: int
+    diff_by_keys: dict
+    diff_by_sign: dict
+    diffing: DiffResultWrapper
