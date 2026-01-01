@@ -1,30 +1,76 @@
 [project]
 name = "tablediff"
-version = "0.2.0"
+authors = [
+  {name = "Oleg Agapov", email="oleg.agapov.ua@gmail.com"}
+]
 description = "CLI tool for data diffing between two tables"
-readme = "README.md"
+keywords = ["data diff", "table diff", "sql diff", "data diffing"]
+license = { text = "Apache-2.0" }
+classifiers = [
+    "Development Status :: 1 - Beta",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Topic :: Database",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+urls = {Homepage = "https://github.com/oleg-agapov/tablediff"}
 requires-python = ">=3.10"
+dynamic = ["version"]
+
 dependencies = [
   "rich",
+  "reladiff"
+]
+
+[project.optional-dependencies]
+duckdb = [
+  "reladiff[duckdb]",
+]
+mysql = [
+  "reladiff[mysql]",
+]
+postgresql = [
+  "reladiff[postgresql]",
+]
+snowflake = [
+  "reladiff[snowflake]",
+  "snowflake-connector-python[secure-local-storage]",
+]
+clickhouse = [
+  "reladiff[clickhouse]",
+]
+
+all = [
   "reladiff[all]",
   "snowflake-connector-python[secure-local-storage]",
 ]
 
-[project.optional-dependencies]
 dev = [
   "pytest",
+  "duckdb"
 ]
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
 
 [project.scripts]
 tablediff = "tablediff.cli:main"
 
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools >= 62.3.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["tablediff*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "snowddl.__version__"}
 
 [tool.uv]
 package = true

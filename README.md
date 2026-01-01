@@ -39,3 +39,15 @@ And then:
 ```
 tablediff users_dev users_prod --pk id --conn duckdb://./sample.duckdb
 ```
+
+# TODO before PyPi release
+
+- [ ] Add proper README
+- [ ] Add pre-commit hooks (check vesion bump?)
+- [ ] Add CI/CD for bublishing new releases
+
+# TODO Future roadmap
+
+- [ ] Add tests
+- [ ] Add dbt support
+
