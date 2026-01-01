@@ -6,7 +6,7 @@ from tablediff.models import TableMeta, DiffResult
 
 def get_schema(db_path, table_name):
     db = connect(db_path)
-    return db.query_table_schema([table_name])
+    return db.query_table_schema(tuple(table_name.split(".")))
 
 
 def query_table(db_path, table_name, columns, where= "1 = 1"):

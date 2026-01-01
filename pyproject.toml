@@ -5,9 +5,9 @@ description = "CLI tool for data diffing between two tables"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-  "duckdb",
   "rich",
-  "reladiff",
+  "reladiff[all]",
+  "snowflake-connector-python[secure-local-storage]",
 ]
 
 [project.optional-dependencies]
