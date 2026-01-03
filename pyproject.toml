@@ -7,7 +7,7 @@ description = "CLI tool for data diffing between two tables"
 keywords = ["data diff", "table diff", "sql diff", "data diffing"]
 license = { text = "Apache-2.0" }
 classifiers = [
-    "Development Status :: 1 - Beta",
+    "Development Status :: 4 - Beta",
     "Operating System :: OS Independent",
     "Intended Audience :: Developers",
     "Topic :: Database",
