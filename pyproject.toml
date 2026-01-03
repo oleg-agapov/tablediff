@@ -1,5 +1,5 @@
 [project]
-name = "tablediff"
+name = "tablediff-cli"
 authors = [
   {name = "Oleg Agapov", email="oleg.agapov.ua@gmail.com"}
 ]
