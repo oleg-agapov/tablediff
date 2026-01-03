@@ -42,6 +42,9 @@ snowflake = [
 clickhouse = [
   "reladiff[clickhouse]",
 ]
+presto = [
+  "reladiff[presto]",
+]
 
 all = [
   "reladiff[all]",
