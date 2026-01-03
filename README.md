@@ -44,7 +44,7 @@ tablediff users_dev users_prod --pk id --conn duckdb://./sample.duckdb
 
 - [ ] Add proper README
 - [ ] Add pre-commit hooks (check vesion bump?)
-- [ ] Add CI/CD for bublishing new releases
+- [x] Add CI/CD for bublishing new releases
 
 # TODO Future roadmap
 
