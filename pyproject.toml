@@ -45,7 +45,18 @@ clickhouse = [
 presto = [
   "reladiff[presto]",
 ]
-
+bigquery = [
+  "google-cloud-bigquery",
+]
+oracle = [
+  "reladiff[oracle]",
+]
+trino = [
+  "reladiff[trino]",
+]
+vertica = [
+  "reladiff[vertica]",
+]
 all = [
   "reladiff[all]",
   "snowflake-connector-python[secure-local-storage]",
