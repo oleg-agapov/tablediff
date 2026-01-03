@@ -70,7 +70,7 @@ where = ["."]
 include = ["tablediff*"]
 
 [tool.setuptools.dynamic]
-version = {attr = "snowddl.__version__"}
+version = {attr = "tablediff.__version__"}
 
 [tool.uv]
 package = true

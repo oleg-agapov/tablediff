@@ -1,8 +1,8 @@
-name: Upload Python Package to PyPI when a Github Release is created
+name: Upload Python Package to PyPI when a Github Release is published
 
 on:
   release:
-    types: [created]
+    types: [published]
 
 jobs:
   pypi-publish:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/<PYPI_PACKAGE_NAME>
+      url: https://pypi.org/p/tablediff-cli
     permissions:
       id-token: write
     
@@ -23,14 +23,14 @@ jobs:
         with:
           python-version: "3.x"
       
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install setuptools wheel
+      - name: Install uv
+        uses: astral-sh/setup-uv@v1
+        with:
+          version: "latest"
       
       - name: Build package
         run: |
-          python setup.py sdist bdist_wheel
+          uv build
       
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
