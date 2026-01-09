@@ -19,7 +19,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--dbt-target", default="dev", help="Target name defined in the dbt profile.")
     parser.add_argument("--env-file", default=".env", help="Path to a .env file that stores credential values.")
     parser.add_argument("--extended", action="store_true", help="Enable extended output")
-    parser.add_argument("--where", help="SQL WHERE clause to filter rows before comparison")
+    parser.add_argument("--where", help="SQL WHERE clause to filter rows before comparison (e.g., \"status = 'active'\")")
     return parser
 
 
