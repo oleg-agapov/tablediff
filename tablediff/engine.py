@@ -36,7 +36,7 @@ def calculate_differences(diffing_result):
 
 
 
-def table_diff(db_path, table_a_name, table_b_name, primary_key) -> DiffResult:
+def table_diff(db_path, table_a_name, table_b_name, primary_key, where=None) -> DiffResult:
     table_a = connect_to_table(db_path, table_a_name, primary_key)
     table_b = connect_to_table(db_path, table_b_name, primary_key)
 
@@ -50,7 +50,7 @@ def table_diff(db_path, table_a_name, table_b_name, primary_key) -> DiffResult:
     # this is needed to preserve the order of columns
     common_cols = [col for col in cols_b if col in common_cols_set]
 
-    diffing = diff_tables(table_a, table_b, key_columns=tuple([primary_key]), extra_columns=tuple(common_cols))
+    diffing = diff_tables(table_a, table_b, key_columns=tuple([primary_key]), extra_columns=tuple(common_cols), where=where)
     stats = diffing.get_stats_dict()
 
     diff_by_keys, diff_by_sign = calculate_differences(diffing)
