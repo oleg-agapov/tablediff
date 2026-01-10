@@ -2,7 +2,7 @@
 
 CLI tool for data diffing between two tables:
 
-![Screenshot of the tool](https://github.com/oleg-agapov/tablediff/blob/main/img/screenshot.png)
+![Screenshot of the tool](https://raw.githubusercontent.com/oleg-agapov/tablediff/refs/heads/main/img/screenshot.png)
 
 ## Installation
 
@@ -66,14 +66,23 @@ tablediff DEV.MART.USERS PROD.MART.USERS \
   --conn "snowflake://..."
 ```
 
-## Extended output
+## Additional flags
 
-If you pass `--extended` you'll get an extended output that will show you:
+### --extended
+If you pass `--extended` flag you'll get an extended output that will show you:
 
 - Common and unique columns in both tables
 - For rows, it will return:
   - 5 id's that are not matching
   - 5 id's that exist only in table A and B
+
+### --where
+
+Allows to pass additional WHERE condition that will be applied to both tables:
+
+```
+tablediff table_a table_b --pk id --conn snowflake://... --where "created_at >= CURRENT_DATE - 7 and status = 'active'"
+```
 
 # Package development
 
@@ -116,6 +125,9 @@ tablediff users_dev users_prod --pk id --conn duckdb://./sample.duckdb
 
 # Future roadmap
 
+- [x] WHERE conditions
+- [x] Add tests
+- [ ] Schema-only comparison (with data types)
+- [ ] Column-by-column comparison (# of rows that are different)
 - [ ] Add pre-commit hooks (check vesion bump?)
-- [ ] Add tests
 - [ ] Add dbt support
