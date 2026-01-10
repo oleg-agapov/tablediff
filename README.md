@@ -81,7 +81,10 @@ If you pass `--extended` flag you'll get an extended output that will show you:
 Allows to pass additional WHERE condition that will be applied to both tables:
 
 ```
-tablediff table_a table_b --pk id --conn snowflake://... --where "created_at >= CURRENT_DATE - 7 and status = 'active'"
+tablediff table_a table_b \
+  --pk id \
+  --conn snowflake://... \
+  --where "created_at >= CURRENT_DATE - 7 and status = 'active'"
 ```
 
 # Package development
