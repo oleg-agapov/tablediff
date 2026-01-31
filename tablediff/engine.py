@@ -36,12 +36,12 @@ def calculate_differences(diffing_result):
 
 
 
-def table_diff(db_path, table_a_name, table_b_name, primary_key, where=None) -> DiffResult:
-    table_a = connect_to_table(db_path, table_a_name, primary_key)
-    table_b = connect_to_table(db_path, table_b_name, primary_key)
+def table_diff(db_path_a, db_path_b, table_a_name, table_b_name, primary_key, where=None) -> DiffResult:
+    table_a = connect_to_table(db_path_a, table_a_name, primary_key)
+    table_b = connect_to_table(db_path_b, table_b_name, primary_key)
 
-    schema_a = get_schema(db_path, table_a_name)
-    schema_b = get_schema(db_path, table_b_name)
+    schema_a = get_schema(db_path_a, table_a_name)
+    schema_b = get_schema(db_path_b, table_b_name)
     
     cols_a = [x for x in schema_a]
     cols_b = [x for x in schema_b]

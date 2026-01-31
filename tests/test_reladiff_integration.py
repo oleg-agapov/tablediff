@@ -25,7 +25,7 @@ class TestConnectToTableIntegration:
         db_path = f"duckdb://{temp_duckdb}"
         
         # Call table_diff which internally calls connect_to_table
-        result = table_diff(db_path, "table_a", "table_b", "id")
+        result = table_diff(db_path, db_path, "table_a", "table_b", "id")
         
         # Verify the result structure indicates connect_to_table was used correctly
         assert isinstance(result, DiffResult)
@@ -42,6 +42,7 @@ class TestConnectToTableIntegration:
         
         # Call with qualified table names
         result = table_diff(
+            db_path,
             db_path,
             "main.table_a",
             "main.table_b",
@@ -65,7 +66,7 @@ class TestDiffTablesIntegration:
         db_path = f"duckdb://{temp_duckdb}"
         
         # Call table_diff which internally calls diff_tables with key_columns
-        result = table_diff(db_path, "table_a", "table_b", "id")
+        result = table_diff(db_path, db_path, "table_a", "table_b", "id")
         
         # Verify diff_tables was called correctly by checking results
         assert result.primary_key == "id"
@@ -83,7 +84,7 @@ class TestDiffTablesIntegration:
         # table_c has: id, name, email, status
         # table_d has: id, name, email, role
         # Common: id, name, email
-        result = table_diff(db_path, "table_c", "table_d", "id")
+        result = table_diff(db_path, db_path, "table_c", "table_d", "id")
         
         # Verify common columns were identified correctly
         assert "id" in result.common_columns
@@ -102,7 +103,7 @@ class TestDiffTablesIntegration:
         where_clause = "id < 3"
         
         # Call table_diff with where clause
-        result = table_diff(db_path, "table_a", "table_b", "id", where=where_clause)
+        result = table_diff(db_path, db_path, "table_a", "table_b", "id", where=where_clause)
         
         # With where clause "id < 3", only rows with id 1 and 2 should be compared
         # Row 1 is unchanged, Row 2 is updated
@@ -119,7 +120,7 @@ class TestDiffTablesIntegration:
         db_path = f"duckdb://{temp_duckdb}"
         
         # Call table_diff
-        result = table_diff(db_path, "table_a", "table_b", "id")
+        result = table_diff(db_path, db_path, "table_a", "table_b", "id")
         
         # Verify stats are correctly parsed and reasonable
         assert result.table_a.rows == 4  # table_a has 4 rows
@@ -137,7 +138,7 @@ class TestDiffTablesIntegration:
         db_path = f"duckdb://{temp_duckdb}"
         
         # Call table_diff
-        result = table_diff(db_path, "table_a", "table_b", "id")
+        result = table_diff(db_path, db_path, "table_a", "table_b", "id")
         
         # Verify diff_by_keys and diff_by_sign are populated correctly
         # Note: Keys are returned as strings from reladiff
@@ -163,7 +164,7 @@ class TestDiffTablesIntegration:
         db_path = f"duckdb://{temp_duckdb}"
         
         # Call table_diff
-        result = table_diff(db_path, "table_a", "table_b", "id")
+        result = table_diff(db_path, db_path, "table_a", "table_b", "id")
         
         # Verify the diffing object is preserved and has expected attributes
         assert result.diffing is not None
@@ -178,7 +179,7 @@ class TestReladiffErrorHandling:
         """Test that connection errors from connect_to_table are propagated."""
         # Try to connect to non-existent database
         with pytest.raises(Exception):
-            table_diff("duckdb:///nonexistent/path/db.duckdb", "table_a", "table_b", "id")
+            table_diff("duckdb:///nonexistent/path/db.duckdb", "duckdb:///nonexistent/path/db.duckdb", "table_a", "table_b", "id")
     
     def test_diff_tables_invalid_key_error(self, temp_duckdb):
         """Test that errors from diff_tables are propagated for invalid keys."""
@@ -186,4 +187,4 @@ class TestReladiffErrorHandling:
         
         # Try to diff with a non-existent primary key column
         with pytest.raises(Exception):
-            table_diff(db_path, "table_a", "table_b", "nonexistent_key")
+            table_diff(db_path, db_path, "table_a", "table_b", "nonexistent_key")
