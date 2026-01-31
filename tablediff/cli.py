@@ -82,5 +82,6 @@ def main() -> None:
         if temp_db_path and os.path.exists(temp_db_path):
             try:
                 os.unlink(temp_db_path)
-            except Exception:
-                pass  # Ignore cleanup errors
+            except (FileNotFoundError, PermissionError, OSError) as e:
+                # Ignore cleanup errors - the file will be cleaned up by the OS eventually
+                pass

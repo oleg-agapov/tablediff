@@ -20,6 +20,13 @@ def load_csv_to_duckdb(csv_path_a, csv_path_b, table_name_a="table_a", table_nam
     """
     import tempfile
     import os
+    import re
+    
+    # Validate table names to prevent SQL injection (only allow alphanumeric and underscores)
+    if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', table_name_a):
+        raise ValueError(f"Invalid table name: {table_name_a}")
+    if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', table_name_b):
+        raise ValueError(f"Invalid table name: {table_name_b}")
     
     # Create a temporary file path for the DuckDB database
     # Note: We need to delete the file first so DuckDB can create it properly
@@ -31,8 +38,9 @@ def load_csv_to_duckdb(csv_path_a, csv_path_b, table_name_a="table_a", table_nam
     conn = duckdb.connect(temp_db_path)
     
     # Load CSV files as tables with auto-detection
-    conn.execute(f"CREATE TABLE {table_name_a} AS SELECT * FROM read_csv('{csv_path_a}', AUTO_DETECT=TRUE)")
-    conn.execute(f"CREATE TABLE {table_name_b} AS SELECT * FROM read_csv('{csv_path_b}', AUTO_DETECT=TRUE)")
+    # Use parameterized queries to safely pass CSV paths
+    conn.execute(f"CREATE TABLE {table_name_a} AS SELECT * FROM read_csv(?, AUTO_DETECT=TRUE)", [csv_path_a])
+    conn.execute(f"CREATE TABLE {table_name_b} AS SELECT * FROM read_csv(?, AUTO_DETECT=TRUE)", [csv_path_b])
     
     conn.close()
     
