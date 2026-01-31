@@ -6,6 +6,7 @@ Tests include:
 - query_table: Verify querying with columns and where clause
 - table_diff: Verify DiffResult with added/removed/updated rows
 - calculate_differences: Verify diff calculation logic
+- schema_diff: Verify schema comparison functionality
 """
 
 import pytest
@@ -15,8 +16,9 @@ from tablediff.engine import (
     query_table,
     table_diff,
     calculate_differences,
+    schema_diff,
 )
-from tablediff.models import DiffResult, TableMeta
+from tablediff.models import DiffResult, TableMeta, SchemaDiffResult
 
 
 class TestGetSchema:
@@ -206,3 +208,81 @@ class TestTableDiff:
         # Rows 2 and 4 should be in updated (!)
         assert ('2',) in result.diff_by_sign["!"]
         assert ('4',) in result.diff_by_sign["!"]
+
+
+class TestSchemaDiff:
+    """Tests for schema_diff function."""
+    
+    def test_schema_diff_same_schema(self, temp_duckdb):
+        """Test schema_diff with two tables having the same schema."""
+        db_path = f"duckdb://{temp_duckdb}"
+        
+        result = schema_diff(db_path, db_path, "table_a", "table_b")
+        
+        # Check result type
+        assert isinstance(result, SchemaDiffResult)
+        
+        # Check table names
+        assert result.table_a == "table_a"
+        assert result.table_b == "table_b"
+        
+        # Check that all columns are present in both tables
+        assert "id" in result.columns
+        assert "name" in result.columns
+        assert "email" in result.columns
+        assert "age" in result.columns
+        
+        # All columns should have the same types in both tables
+        for col_name, col_info in result.columns.items():
+            assert col_info["table_a"] is not None
+            assert col_info["table_b"] is not None
+            assert col_info["table_a"] == col_info["table_b"]
+    
+    def test_schema_diff_different_columns(self, temp_duckdb):
+        """Test schema_diff with tables having different columns."""
+        db_path = f"duckdb://{temp_duckdb}"
+        
+        # table_c has columns: id, name, email, status
+        # table_d has columns: id, name, email, role
+        result = schema_diff(db_path, db_path, "table_c", "table_d")
+        
+        # Check result type
+        assert isinstance(result, SchemaDiffResult)
+        
+        # Check that all columns from both tables are present
+        assert "id" in result.columns
+        assert "name" in result.columns
+        assert "email" in result.columns
+        assert "status" in result.columns
+        assert "role" in result.columns
+        
+        # Common columns should have types in both tables
+        assert result.columns["id"]["table_a"] is not None
+        assert result.columns["id"]["table_b"] is not None
+        assert result.columns["name"]["table_a"] is not None
+        assert result.columns["name"]["table_b"] is not None
+        assert result.columns["email"]["table_a"] is not None
+        assert result.columns["email"]["table_b"] is not None
+        
+        # status should only be in table_a
+        assert result.columns["status"]["table_a"] is not None
+        assert result.columns["status"]["table_b"] is None
+        
+        # role should only be in table_b
+        assert result.columns["role"]["table_a"] is None
+        assert result.columns["role"]["table_b"] is not None
+    
+    def test_schema_diff_columns_dict_structure(self, temp_duckdb):
+        """Test that schema_diff returns correct dictionary structure."""
+        db_path = f"duckdb://{temp_duckdb}"
+        
+        result = schema_diff(db_path, db_path, "table_c", "table_d")
+        
+        # Verify the structure of the columns dictionary
+        for col_name, col_info in result.columns.items():
+            assert isinstance(col_info, dict)
+            assert "table_a" in col_info
+            assert "table_b" in col_info
+            # Each value should be either a string (type) or None
+            assert isinstance(col_info["table_a"], (str, type(None)))
+            assert isinstance(col_info["table_b"], (str, type(None)))

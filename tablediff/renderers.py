@@ -2,7 +2,7 @@ from rich import box
 from rich.table import Table
 from rich.panel import Panel
 from rich.console import Console
-from tablediff.models import DiffResult
+from tablediff.models import DiffResult, SchemaDiffResult
 
 def _format_list(items: list[str]) -> str:
         return f"{', '.join(items)}" if items else "-"
@@ -116,4 +116,50 @@ def render_extended_table(result: DiffResult) -> None:
     table.add_row("→ " + result.table_b.name, f"[{len(rows_only_in_b)}] {_format_keys_sample(rows_only_in_b)}", style="green")
 
     console.print(Panel.fit(table, padding=(1, 2), title="🕵️‍♀️ Extended info"))
+    console.print()
+
+
+def render_schema_diff(result: SchemaDiffResult) -> None:
+    """
+    Render schema comparison in a table format.
+    
+    Args:
+        result: SchemaDiffResult containing schema comparison data
+    """
+    console = Console()
+    console.print()
+    
+    table = Table(show_header=True, padding=(0, 2), box=box.MINIMAL)
+    table.add_column("Column", style="bold")
+    table.add_column(result.table_a, justify="left")
+    table.add_column(result.table_b, justify="left")
+    table.add_column("Status", justify="center")
+    
+    for col_name in sorted(result.columns.keys()):
+        col_info = result.columns[col_name]
+        type_a = col_info["table_a"]
+        type_b = col_info["table_b"]
+        
+        # Determine the status and styling
+        if type_a is None:
+            status = "+"
+            status_style = "green"
+            type_a_display = "-"
+        elif type_b is None:
+            status = "-"
+            status_style = "yellow"
+            type_b_display = "-"
+        elif type_a == type_b:
+            status = "✓"
+            status_style = "green"
+        else:
+            status = "≠"
+            status_style = "yellow"
+        
+        type_a_display = type_a if type_a is not None else "-"
+        type_b_display = type_b if type_b is not None else "-"
+        
+        table.add_row(col_name, type_a_display, type_b_display, status, style=status_style)
+    
+    console.print(Panel.fit(table, padding=(1, 2), title="📋 Schema comparison"))
     console.print()
