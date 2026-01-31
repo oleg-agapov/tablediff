@@ -92,9 +92,13 @@ def schema_diff(db_path_a, db_path_b, table_a_name, table_b_name) -> SchemaDiffR
     # Build the comparison dictionary
     columns = {}
     for col in sorted(all_columns):
+        # Extract type name from schema tuple (second element)
+        type_a = schema_a[col][1] if col in schema_a else None
+        type_b = schema_b[col][1] if col in schema_b else None
+        
         columns[col] = {
-            "table_a": str(schema_a[col]) if col in schema_a else None,
-            "table_b": str(schema_b[col]) if col in schema_b else None
+            "table_a": type_a,
+            "table_b": type_b
         }
     
     return SchemaDiffResult(
