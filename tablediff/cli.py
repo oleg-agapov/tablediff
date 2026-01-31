@@ -13,9 +13,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("table_b", help="Second table name.")
 
     parser.add_argument("--pk", required=True, help="Primary key column name.")
-    parser.add_argument("--conn", help="Database connection string (used for both tables unless overridden by --conn-a/--conn-b).")
-    parser.add_argument("--conn-a", help="Database connection string for table_a (overrides --conn for table_a).")
-    parser.add_argument("--conn-b", help="Database connection string for table_b (overrides --conn for table_b).")
+    parser.add_argument("--conn", help="Database connection string for table_a (or both tables if --conn2 not provided).")
+    parser.add_argument("--conn2", help="Database connection string for table_b (when comparing across different databases).")
     parser.add_argument("--dbt-profile-path", default="profiles.yml", help="Path to dbt profiles file.")
     parser.add_argument("--dbt-profile", default="dbt_analytics", help="Profile name inside the profiles.yml file.")
     parser.add_argument("--dbt-target", default="dev", help="Target name defined in the dbt profile.")
@@ -30,9 +29,10 @@ def main() -> None:
     args = parser.parse_args()
     
     # Determine connection strings for each table
-    # Use --conn as default, but override with --conn-a/--conn-b if provided
-    conn_a = args.conn_a if args.conn_a else args.conn
-    conn_b = args.conn_b if args.conn_b else args.conn
+    # --conn is used for table_a (and table_b if --conn2 is not provided)
+    # --conn2 is used for table_b when comparing across different databases
+    conn_a = args.conn
+    conn_b = args.conn2 if args.conn2 else args.conn
     
     results = table_diff(conn_a, conn_b, args.table_a, args.table_b, args.pk, where=args.where)
     render_summary_table(results)

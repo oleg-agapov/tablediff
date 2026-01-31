@@ -3,8 +3,7 @@ Unit tests for tablediff CLI functionality.
 
 Tests the CLI argument parsing and connection string handling for:
 - Single connection (--conn)
-- Cross-database connections (--conn-a and --conn-b)
-- Mixed usage (--conn with --conn-a/--conn-b overrides)
+- Cross-database connections (--conn and --conn2)
 """
 
 import pytest
@@ -25,36 +24,20 @@ class TestCLIArguments:
         ])
         
         assert args.conn == "duckdb://./db.duckdb"
-        assert args.conn_a is None
-        assert args.conn_b is None
+        assert args.conn2 is None
     
-    def test_parser_accepts_conn_a_and_conn_b(self):
-        """Test that parser accepts --conn-a and --conn-b arguments."""
+    def test_parser_accepts_conn_and_conn2(self):
+        """Test that parser accepts --conn and --conn2 arguments."""
         parser = build_parser()
         args = parser.parse_args([
             "table_a", "table_b",
             "--pk", "id",
-            "--conn-a", "duckdb://./db_a.duckdb",
-            "--conn-b", "duckdb://./db_b.duckdb"
+            "--conn", "duckdb://./db_a.duckdb",
+            "--conn2", "duckdb://./db_b.duckdb"
         ])
         
-        assert args.conn_a == "duckdb://./db_a.duckdb"
-        assert args.conn_b == "duckdb://./db_b.duckdb"
-        assert args.conn is None
-    
-    def test_parser_accepts_mixed_conn_arguments(self):
-        """Test that parser accepts --conn with --conn-a/--conn-b overrides."""
-        parser = build_parser()
-        args = parser.parse_args([
-            "table_a", "table_b",
-            "--pk", "id",
-            "--conn", "duckdb://./default.duckdb",
-            "--conn-a", "duckdb://./db_a.duckdb"
-        ])
-        
-        assert args.conn == "duckdb://./default.duckdb"
-        assert args.conn_a == "duckdb://./db_a.duckdb"
-        assert args.conn_b is None
+        assert args.conn == "duckdb://./db_a.duckdb"
+        assert args.conn2 == "duckdb://./db_b.duckdb"
 
 
 class TestCLIConnectionLogic:
@@ -87,15 +70,15 @@ class TestCLIConnectionLogic:
     @patch('tablediff.cli.table_diff')
     @patch('tablediff.cli.render_summary_table')
     def test_main_uses_separate_connections(self, mock_render, mock_table_diff):
-        """Test that main uses --conn-a and --conn-b when both are provided."""
+        """Test that main uses --conn and --conn2 when both are provided."""
         mock_table_diff.return_value = MagicMock()
         
         with patch('sys.argv', [
             'tablediff',
             'table_a', 'table_b',
             '--pk', 'id',
-            '--conn-a', 'duckdb://./db_a.duckdb',
-            '--conn-b', 'duckdb://./db_b.duckdb'
+            '--conn', 'duckdb://./db_a.duckdb',
+            '--conn2', 'duckdb://./db_b.duckdb'
         ]):
             main()
         
@@ -103,82 +86,6 @@ class TestCLIConnectionLogic:
         mock_table_diff.assert_called_once_with(
             'duckdb://./db_a.duckdb',  # conn_a
             'duckdb://./db_b.duckdb',  # conn_b
-            'table_a',
-            'table_b',
-            'id',
-            where=None
-        )
-    
-    @patch('tablediff.cli.table_diff')
-    @patch('tablediff.cli.render_summary_table')
-    def test_main_conn_a_overrides_conn_for_table_a(self, mock_render, mock_table_diff):
-        """Test that --conn-a overrides --conn for table_a."""
-        mock_table_diff.return_value = MagicMock()
-        
-        with patch('sys.argv', [
-            'tablediff',
-            'table_a', 'table_b',
-            '--pk', 'id',
-            '--conn', 'duckdb://./default.duckdb',
-            '--conn-a', 'duckdb://./db_a.duckdb'
-        ]):
-            main()
-        
-        # Verify conn_a uses --conn-a, conn_b uses --conn
-        mock_table_diff.assert_called_once_with(
-            'duckdb://./db_a.duckdb',     # conn_a (overridden)
-            'duckdb://./default.duckdb',  # conn_b (default)
-            'table_a',
-            'table_b',
-            'id',
-            where=None
-        )
-    
-    @patch('tablediff.cli.table_diff')
-    @patch('tablediff.cli.render_summary_table')
-    def test_main_conn_b_overrides_conn_for_table_b(self, mock_render, mock_table_diff):
-        """Test that --conn-b overrides --conn for table_b."""
-        mock_table_diff.return_value = MagicMock()
-        
-        with patch('sys.argv', [
-            'tablediff',
-            'table_a', 'table_b',
-            '--pk', 'id',
-            '--conn', 'duckdb://./default.duckdb',
-            '--conn-b', 'duckdb://./db_b.duckdb'
-        ]):
-            main()
-        
-        # Verify conn_a uses --conn, conn_b uses --conn-b
-        mock_table_diff.assert_called_once_with(
-            'duckdb://./default.duckdb',  # conn_a (default)
-            'duckdb://./db_b.duckdb',     # conn_b (overridden)
-            'table_a',
-            'table_b',
-            'id',
-            where=None
-        )
-    
-    @patch('tablediff.cli.table_diff')
-    @patch('tablediff.cli.render_summary_table')
-    def test_main_both_overrides_with_conn(self, mock_render, mock_table_diff):
-        """Test that both --conn-a and --conn-b override --conn."""
-        mock_table_diff.return_value = MagicMock()
-        
-        with patch('sys.argv', [
-            'tablediff',
-            'table_a', 'table_b',
-            '--pk', 'id',
-            '--conn', 'duckdb://./default.duckdb',
-            '--conn-a', 'duckdb://./db_a.duckdb',
-            '--conn-b', 'duckdb://./db_b.duckdb'
-        ]):
-            main()
-        
-        # Verify both connections are overridden
-        mock_table_diff.assert_called_once_with(
-            'duckdb://./db_a.duckdb',  # conn_a (overridden)
-            'duckdb://./db_b.duckdb',  # conn_b (overridden)
             'table_a',
             'table_b',
             'id',
@@ -196,8 +103,8 @@ class TestCLIConnectionLogic:
             'tablediff',
             'table_a', 'table_b',
             '--pk', 'id',
-            '--conn-a', 'duckdb://./db_a.duckdb',
-            '--conn-b', 'duckdb://./db_b.duckdb',
+            '--conn', 'duckdb://./db_a.duckdb',
+            '--conn2', 'duckdb://./db_b.duckdb',
             '--extended'
         ]):
             main()
@@ -216,8 +123,8 @@ class TestCLIConnectionLogic:
             'tablediff',
             'table_a', 'table_b',
             '--pk', 'id',
-            '--conn-a', 'duckdb://./db_a.duckdb',
-            '--conn-b', 'duckdb://./db_b.duckdb',
+            '--conn', 'duckdb://./db_a.duckdb',
+            '--conn2', 'duckdb://./db_b.duckdb',
             '--where', 'status = "active"'
         ]):
             main()
