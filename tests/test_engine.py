@@ -131,7 +131,7 @@ class TestTableDiff:
         """Test table_diff with two tables having added/removed/updated rows."""
         db_path = f"duckdb://{temp_duckdb}"
         
-        result = table_diff(db_path, "table_a", "table_b", "id")
+        result = table_diff(db_path, db_path, "table_a", "table_b", "id")
         
         # Check result type
         assert isinstance(result, DiffResult)
@@ -167,7 +167,7 @@ class TestTableDiff:
         """Test that table_diff correctly identifies common columns."""
         db_path = f"duckdb://{temp_duckdb}"
         
-        result = table_diff(db_path, "table_a", "table_b", "id")
+        result = table_diff(db_path, db_path, "table_a", "table_b", "id")
         
         # All columns should be common since both tables have same schema
         assert set(result.common_columns) == {"id", "name", "email", "age"}
@@ -176,7 +176,7 @@ class TestTableDiff:
         """Test that diff_by_keys contains the correct mappings."""
         db_path = f"duckdb://{temp_duckdb}"
         
-        result = table_diff(db_path, "table_a", "table_b", "id")
+        result = table_diff(db_path, db_path, "table_a", "table_b", "id")
         
         # Check diff_by_keys structure
         # Note: Keys are returned as strings from reladiff
@@ -189,7 +189,7 @@ class TestTableDiff:
         """Test that diff_by_sign contains the correct groupings."""
         db_path = f"duckdb://{temp_duckdb}"
         
-        result = table_diff(db_path, "table_a", "table_b", "id")
+        result = table_diff(db_path, db_path, "table_a", "table_b", "id")
         
         # Check diff_by_sign structure
         assert "-" in result.diff_by_sign

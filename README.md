@@ -34,7 +34,18 @@ tablediff TABLE_A TABLE_B --pk PRIMARY_KEY --conn CONNECTION_STRING [OPTIONS]
 - tables should be in format `table_name` or `schema.table_name` or `database.schema.table_name`
   - for Snowflake use all identifiers in UPPERCASE
 - `--pk` is the primary key column (should exist in both tables)
-- `--conn` is the database connection string
+- `--conn` is the database connection string for table_a (or both tables if `--conn2` is not provided)
+
+### Cross-Database Comparison
+
+You can compare tables across different databases using `--conn` and `--conn2`:
+
+```
+tablediff TABLE_A TABLE_B --pk PRIMARY_KEY --conn CONNECTION_A --conn2 CONNECTION_B [OPTIONS]
+```
+
+- `--conn` - connection string for TABLE_A (and TABLE_B if `--conn2` not provided)
+- `--conn2` - connection string for TABLE_B (when comparing across different databases)
 
 Here are a could of examples of connection strings:
 
@@ -52,10 +63,18 @@ For other databases check [docs for reladiff](https://reladiff.readthedocs.io/en
 
 ## Examples
 
-Diffing in DuckDB:
+Diffing in DuckDB (same database):
 
 ```
 tablediff users_prod users_dev --pk id --conn duckdb://./sample.duckdb
+```
+
+Diffing across two DuckDB databases:
+
+```
+tablediff users users --pk id \
+  --conn duckdb://./prod.duckdb \
+  --conn2 duckdb://./dev.duckdb
 ```
 
 Diffing in Snowflake:
@@ -64,6 +83,15 @@ Diffing in Snowflake:
 tablediff DEV.MART.USERS PROD.MART.USERS \
   --pk USER_ID \
   --conn "snowflake://..."
+```
+
+Cross-database diffing (Snowflake to DuckDB):
+
+```
+tablediff PROD.MART.USERS local_users \
+  --pk USER_ID \
+  --conn "snowflake://..." \
+  --conn2 duckdb://./local.duckdb
 ```
 
 ## Additional flags
@@ -130,6 +158,7 @@ tablediff users_dev users_prod --pk id --conn duckdb://./sample.duckdb
 
 - [x] WHERE conditions
 - [x] Add tests
+- [x] Cross-database comparison
 - [ ] Schema-only comparison (with data types)
 - [ ] Column-by-column comparison (# of rows that are different)
 - [ ] Add pre-commit hooks (check vesion bump?)
