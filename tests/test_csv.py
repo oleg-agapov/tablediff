@@ -86,7 +86,7 @@ class TestLoadCSVToDuckDB:
         conn = duckdb.connect(temp_db_path)
         
         # Check custom table names exist
-        tables = conn.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='main'").fetchall()
+        tables = conn.execute("SELECT table_name FROM information_schema.tables WHERE table_schema=?", ['main']).fetchall()
         table_names = [t[0] for t in tables]
         
         assert "custom_a" in table_names

@@ -38,9 +38,9 @@ def load_csv_to_duckdb(csv_path_a, csv_path_b, table_name_a="table_a", table_nam
     conn = duckdb.connect(temp_db_path)
     
     # Load CSV files as tables with auto-detection
-    # Use parameterized queries to safely pass CSV paths
-    conn.execute(f"CREATE TABLE {table_name_a} AS SELECT * FROM read_csv(?, AUTO_DETECT=TRUE)", [csv_path_a])
-    conn.execute(f"CREATE TABLE {table_name_b} AS SELECT * FROM read_csv(?, AUTO_DETECT=TRUE)", [csv_path_b])
+    # Use parameterized queries to safely pass CSV paths and quote table names
+    conn.execute(f'CREATE TABLE "{table_name_a}" AS SELECT * FROM read_csv(?, AUTO_DETECT=TRUE)', [csv_path_a])
+    conn.execute(f'CREATE TABLE "{table_name_b}" AS SELECT * FROM read_csv(?, AUTO_DETECT=TRUE)', [csv_path_b])
     
     conn.close()
     
