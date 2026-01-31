@@ -38,6 +38,30 @@ class TestCLIArguments:
         
         assert args.conn == "duckdb://./db_a.duckdb"
         assert args.conn2 == "duckdb://./db_b.duckdb"
+    
+    def test_parser_accepts_schema_only(self):
+        """Test that parser accepts --schema-only argument."""
+        parser = build_parser()
+        args = parser.parse_args([
+            "table_a", "table_b",
+            "--conn", "duckdb://./db.duckdb",
+            "--schema-only"
+        ])
+        
+        assert args.schema_only is True
+    
+    def test_parser_schema_only_without_pk(self):
+        """Test that parser accepts --schema-only without --pk."""
+        parser = build_parser()
+        args = parser.parse_args([
+            "table_a", "table_b",
+            "--conn", "duckdb://./db.duckdb",
+            "--schema-only"
+        ])
+        
+        # Should not raise an error
+        assert args.schema_only is True
+        assert args.pk is None
 
 
 class TestCLIConnectionLogic:
@@ -95,9 +119,12 @@ class TestCLIConnectionLogic:
     @patch('tablediff.cli.table_diff')
     @patch('tablediff.cli.render_summary_table')
     @patch('tablediff.cli.render_extended_table')
-    def test_main_extended_flag_works_with_cross_db(self, mock_ext, mock_summary, mock_table_diff):
+    @patch('tablediff.cli.schema_diff')
+    @patch('tablediff.cli.render_schema_diff')
+    def test_main_extended_flag_works_with_cross_db(self, mock_schema_render, mock_schema_diff, mock_ext, mock_summary, mock_table_diff):
         """Test that --extended flag works with cross-database comparison."""
         mock_table_diff.return_value = MagicMock()
+        mock_schema_diff.return_value = MagicMock()
         
         with patch('sys.argv', [
             'tablediff',
@@ -112,6 +139,9 @@ class TestCLIConnectionLogic:
         # Verify extended output is rendered
         mock_summary.assert_called_once()
         mock_ext.assert_called_once()
+        # Verify schema comparison is also rendered in extended mode
+        mock_schema_diff.assert_called_once()
+        mock_schema_render.assert_called_once()
     
     @patch('tablediff.cli.table_diff')
     @patch('tablediff.cli.render_summary_table')
@@ -138,3 +168,50 @@ class TestCLIConnectionLogic:
             'id',
             where='status = "active"'
         )
+    
+    @patch('tablediff.cli.schema_diff')
+    @patch('tablediff.cli.render_schema_diff')
+    def test_main_schema_only_flag(self, mock_render, mock_schema_diff):
+        """Test that --schema-only flag calls schema_diff instead of table_diff."""
+        mock_schema_diff.return_value = MagicMock()
+        
+        with patch('sys.argv', [
+            'tablediff',
+            'table_a', 'table_b',
+            '--conn', 'duckdb://./db.duckdb',
+            '--schema-only'
+        ]):
+            main()
+        
+        # Verify schema_diff was called
+        mock_schema_diff.assert_called_once_with(
+            'duckdb://./db.duckdb',
+            'duckdb://./db.duckdb',
+            'table_a',
+            'table_b'
+        )
+        mock_render.assert_called_once()
+    
+    @patch('tablediff.cli.schema_diff')
+    @patch('tablediff.cli.render_schema_diff')
+    def test_main_schema_only_with_cross_db(self, mock_render, mock_schema_diff):
+        """Test that --schema-only works with cross-database comparison."""
+        mock_schema_diff.return_value = MagicMock()
+        
+        with patch('sys.argv', [
+            'tablediff',
+            'table_a', 'table_b',
+            '--conn', 'duckdb://./db_a.duckdb',
+            '--conn2', 'duckdb://./db_b.duckdb',
+            '--schema-only'
+        ]):
+            main()
+        
+        # Verify schema_diff was called with different connections
+        mock_schema_diff.assert_called_once_with(
+            'duckdb://./db_a.duckdb',
+            'duckdb://./db_b.duckdb',
+            'table_a',
+            'table_b'
+        )
+        mock_render.assert_called_once()

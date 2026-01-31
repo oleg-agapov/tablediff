@@ -21,3 +21,9 @@ class DiffResult:
     diff_by_keys: dict
     diff_by_sign: dict
     diffing: DiffResultWrapper
+
+@dataclass(frozen=True)
+class SchemaDiffResult:
+    table_a: str
+    table_b: str
+    columns: dict[str, dict[str, str | None]]

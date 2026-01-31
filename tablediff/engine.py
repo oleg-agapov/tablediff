@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from reladiff import connect_to_table, diff_tables, connect
-from tablediff.models import TableMeta, DiffResult
+from tablediff.models import TableMeta, DiffResult, SchemaDiffResult
 
 
 def get_schema(db_path, table_name):
@@ -67,4 +67,42 @@ def table_diff(db_path_a, db_path_b, table_a_name, table_b_name, primary_key, wh
         diff_by_keys=diff_by_keys,
         diff_by_sign=diff_by_sign,
         diffing=diffing
+    )
+
+
+def schema_diff(db_path_a, db_path_b, table_a_name, table_b_name) -> SchemaDiffResult:
+    """
+    Compare schemas of two tables and return a comparison dictionary.
+    
+    Args:
+        db_path_a: Database connection string for table A
+        db_path_b: Database connection string for table B
+        table_a_name: Name of table A
+        table_b_name: Name of table B
+    
+    Returns:
+        SchemaDiffResult with table names and column type comparison
+    """
+    schema_a = get_schema(db_path_a, table_a_name)
+    schema_b = get_schema(db_path_b, table_b_name)
+    
+    # Get all unique column names from both tables
+    all_columns = set(schema_a.keys()).union(set(schema_b.keys()))
+    
+    # Build the comparison dictionary
+    columns = {}
+    for col in sorted(all_columns):
+        # Extract type name from schema tuple (second element)
+        type_a = schema_a[col][1] if col in schema_a else None
+        type_b = schema_b[col][1] if col in schema_b else None
+        
+        columns[col] = {
+            "table_a": type_a,
+            "table_b": type_b
+        }
+    
+    return SchemaDiffResult(
+        table_a=table_a_name,
+        table_b=table_b_name,
+        columns=columns
     )
