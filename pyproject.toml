@@ -22,7 +22,8 @@ dynamic = ["version"]
 
 dependencies = [
   "rich",
-  "reladiff"
+  "reladiff",
+  "duckdb"
 ]
 
 [project.optional-dependencies]

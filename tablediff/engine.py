@@ -1,7 +1,43 @@
 from __future__ import annotations
 
+import duckdb
 from reladiff import connect_to_table, diff_tables, connect
 from tablediff.models import TableMeta, DiffResult, SchemaDiffResult
+
+
+def load_csv_to_duckdb(csv_path_a, csv_path_b, table_name_a="table_a", table_name_b="table_b"):
+    """
+    Load two CSV files into a temporary DuckDB database and return the connection string.
+    
+    Args:
+        csv_path_a: Path to the first CSV file
+        csv_path_b: Path to the second CSV file
+        table_name_a: Name to use for the first table (default: "table_a")
+        table_name_b: Name to use for the second table (default: "table_b")
+    
+    Returns:
+        tuple: (connection_string, temp_db_path) - Connection string and path to temporary database
+    """
+    import tempfile
+    import os
+    
+    # Create a temporary file path for the DuckDB database
+    # Note: We need to delete the file first so DuckDB can create it properly
+    temp_db_fd, temp_db_path = tempfile.mkstemp(suffix='.duckdb')
+    os.close(temp_db_fd)
+    os.unlink(temp_db_path)  # Remove the empty file so DuckDB can create its own
+    
+    # Connect to the temporary database and load CSV files
+    conn = duckdb.connect(temp_db_path)
+    
+    # Load CSV files as tables with auto-detection
+    conn.execute(f"CREATE TABLE {table_name_a} AS SELECT * FROM read_csv('{csv_path_a}', AUTO_DETECT=TRUE)")
+    conn.execute(f"CREATE TABLE {table_name_b} AS SELECT * FROM read_csv('{csv_path_b}', AUTO_DETECT=TRUE)")
+    
+    conn.close()
+    
+    # Return the connection string for the temporary database
+    return f"duckdb://{temp_db_path}", temp_db_path
 
 
 def get_schema(db_path, table_name):
