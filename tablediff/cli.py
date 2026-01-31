@@ -49,3 +49,6 @@ def main() -> None:
         render_summary_table(results)
         if args.extended:
             render_extended_table(results)
+            # Also show schema comparison in extended output
+            schema_result = schema_diff(conn_a, conn_b, args.table_a, args.table_b)
+            render_schema_diff(schema_result)

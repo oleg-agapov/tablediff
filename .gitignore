@@ -12,4 +12,5 @@ __pycache__/
 
 sample.duckdb
 test_schema.duckdb
+test_extended.duckdb
 profiles.yml
