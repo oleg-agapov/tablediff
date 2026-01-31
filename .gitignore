@@ -10,7 +10,5 @@ __pycache__/
 *.egg-info/
 *.egg
 
-sample.duckdb
-test_schema.duckdb
-test_extended.duckdb
+*.duckdb
 profiles.yml
