@@ -140,24 +140,23 @@ def render_schema_diff(result: SchemaDiffResult) -> None:
         type_a = col_info["table_a"]
         type_b = col_info["table_b"]
         
+        # Prepare display values
+        type_a_display = type_a if type_a is not None else "-"
+        type_b_display = type_b if type_b is not None else "-"
+        
         # Determine the status and styling
         if type_a is None:
             status = "+"
             status_style = "green"
-            type_a_display = "-"
         elif type_b is None:
             status = "-"
             status_style = "yellow"
-            type_b_display = "-"
         elif type_a == type_b:
             status = "✓"
             status_style = "green"
         else:
             status = "≠"
             status_style = "yellow"
-        
-        type_a_display = type_a if type_a is not None else "-"
-        type_b_display = type_b if type_b is not None else "-"
         
         table.add_row(col_name, type_a_display, type_b_display, status, style=status_style)
     
