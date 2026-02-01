@@ -22,13 +22,11 @@ dynamic = ["version"]
 
 dependencies = [
   "rich",
-  "reladiff"
+  "reladiff",
+  "duckdb"
 ]
 
 [project.optional-dependencies]
-duckdb = [
-  "reladiff[duckdb]",
-]
 mysql = [
   "reladiff[mysql]",
 ]
@@ -63,8 +61,7 @@ all = [
 ]
 
 dev = [
-  "pytest",
-  "duckdb"
+  "pytest"
 ]
 
 [project.readme]
