@@ -4,7 +4,6 @@ Unit tests for CSV comparison functionality.
 
 import pytest
 import os
-import tempfile
 from unittest.mock import patch, MagicMock
 from tablediff.engine import load_csv_to_duckdb
 from tablediff.cli import main
@@ -99,20 +98,20 @@ class TestLoadCSVToDuckDB:
 class TestCSVCLI:
     """Tests for CSV CLI functionality."""
     
-    def test_parser_accepts_csv_flag(self):
-        """Test that parser accepts --csv argument."""
+    def test_parser_accepts_files_command(self):
+        """Test that parser accepts files command."""
         from tablediff.cli import build_parser
         
         parser = build_parser()
         args = parser.parse_args([
+            "files",
             "file_a.csv", "file_b.csv",
-            "--pk", "id",
-            "--csv"
+            "--pk", "id"
         ])
         
-        assert args.csv is True
-        assert args.table_a == "file_a.csv"
-        assert args.table_b == "file_b.csv"
+        assert args.command == "files"
+        assert args.file_a == "file_a.csv"
+        assert args.file_b == "file_b.csv"
     
     @patch('tablediff.cli.table_diff')
     @patch('tablediff.cli.render_summary_table')
@@ -127,9 +126,9 @@ class TestCSVCLI:
         
         with patch('sys.argv', [
             'tablediff',
+            'files',
             csv_a, csv_b,
             '--pk', 'id',
-            '--csv'
         ]):
             main()
         
@@ -154,9 +153,9 @@ class TestCSVCLI:
         """Test that main function raises error when CSV file not found."""
         with patch('sys.argv', [
             'tablediff',
+            'files',
             '/nonexistent/file_a.csv', '/nonexistent/file_b.csv',
             '--pk', 'id',
-            '--csv'
         ]):
             with pytest.raises(SystemExit):
                 main()
@@ -173,9 +172,9 @@ class TestCSVCLI:
         
         with patch('sys.argv', [
             'tablediff',
+            'files',
             csv_a, csv_b,
             '--pk', 'id',
-            '--csv',
             '--where', 'age > 25'
         ]):
             main()
@@ -184,33 +183,6 @@ class TestCSVCLI:
         call_args = mock_table_diff.call_args
         assert call_args[1]['where'] == 'age > 25'
     
-    @patch('tablediff.cli.schema_diff')
-    @patch('tablediff.cli.render_schema_diff')
-    @patch('tablediff.cli.load_csv_to_duckdb')
-    def test_main_csv_mode_schema_only(self, mock_load_csv, mock_render, mock_schema_diff, csv_files):
-        """Test that CSV mode works with --schema-only flag."""
-        csv_a, csv_b = csv_files
-        
-        mock_load_csv.return_value = ("duckdb:///tmp/test.duckdb", "/tmp/test.duckdb")
-        mock_schema_diff.return_value = MagicMock()
-        
-        with patch('sys.argv', [
-            'tablediff',
-            csv_a, csv_b,
-            '--csv',
-            '--schema-only'
-        ]):
-            main()
-        
-        # Verify schema_diff was called
-        mock_schema_diff.assert_called_once_with(
-            "duckdb:///tmp/test.duckdb",
-            "duckdb:///tmp/test.duckdb",
-            "table_a_csv",
-            "table_b_csv"
-        )
-
-
 class TestCSVIntegration:
     """Integration tests for CSV comparison."""
     
@@ -220,9 +192,9 @@ class TestCSVIntegration:
         
         with patch('sys.argv', [
             'tablediff',
+            'files',
             csv_a, csv_b,
-            '--pk', 'id',
-            '--csv'
+            '--pk', 'id'
         ]):
             # This should not raise an error
             main()

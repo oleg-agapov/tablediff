@@ -28,7 +28,7 @@ Requires Python 3.10+. Technically can be downported to earlier versions, let me
 Once installed, use command-line to run the diffing process:
 
 ```
-tablediff TABLE_A TABLE_B --pk PRIMARY_KEY --conn CONNECTION_STRING [OPTIONS]
+tablediff compare TABLE_A TABLE_B --pk PRIMARY_KEY --conn CONNECTION_STRING [OPTIONS]
 ```
 
 - tables should be in format `table_name` or `schema.table_name` or `database.schema.table_name`
@@ -36,12 +36,24 @@ tablediff TABLE_A TABLE_B --pk PRIMARY_KEY --conn CONNECTION_STRING [OPTIONS]
 - `--pk` is the primary key column (should exist in both tables)
 - `--conn` is the database connection string for table_a (or both tables if `--conn2` is not provided)
 
+Schema-only comparison:
+
+```
+tablediff schema TABLE_A TABLE_B --conn CONNECTION_STRING [--conn2 CONNECTION_STRING]
+```
+
+CSV comparison:
+
+```
+tablediff files FILE_A FILE_B --pk PRIMARY_KEY [OPTIONS]
+```
+
 ### Cross-Database Comparison
 
 You can compare tables across different databases using `--conn` and `--conn2`:
 
 ```
-tablediff TABLE_A TABLE_B --pk PRIMARY_KEY --conn CONNECTION_A --conn2 CONNECTION_B [OPTIONS]
+tablediff compare TABLE_A TABLE_B --pk PRIMARY_KEY --conn CONNECTION_A --conn2 CONNECTION_B [OPTIONS]
 ```
 
 - `--conn` - connection string for TABLE_A (and TABLE_B if `--conn2` not provided)
@@ -66,13 +78,13 @@ For other databases check [docs for reladiff](https://reladiff.readthedocs.io/en
 Diffing in DuckDB (same database):
 
 ```
-tablediff users_prod users_dev --pk id --conn duckdb://./sample.duckdb
+tablediff compare users_prod users_dev --pk id --conn duckdb://./sample.duckdb
 ```
 
 Diffing across two DuckDB databases:
 
 ```
-tablediff users users --pk id \
+tablediff compare users users --pk id \
   --conn duckdb://./prod.duckdb \
   --conn2 duckdb://./dev.duckdb
 ```
@@ -80,7 +92,7 @@ tablediff users users --pk id \
 Diffing in Snowflake:
 
 ```
-tablediff DEV.MART.USERS PROD.MART.USERS \
+tablediff compare DEV.MART.USERS PROD.MART.USERS \
   --pk USER_ID \
   --conn "snowflake://..."
 ```
@@ -88,7 +100,7 @@ tablediff DEV.MART.USERS PROD.MART.USERS \
 Cross-database diffing (Snowflake to DuckDB):
 
 ```
-tablediff PROD.MART.USERS local_users \
+tablediff compare PROD.MART.USERS local_users \
   --pk USER_ID \
   --conn "snowflake://..." \
   --conn2 duckdb://./local.duckdb
@@ -106,10 +118,10 @@ If you pass `--extended` flag you'll get an extended output that will show you:
 
 ### --where
 
-Allows to pass additional WHERE condition that will be applied to both tables:
+Allows to pass additional WHERE condition that will be applied to both tables (compare/files):
 
 ```
-tablediff table_a table_b \
+tablediff compare table_a table_b \
   --pk id \
   --conn snowflake://... \
   --where "created_at >= CURRENT_DATE - 7 and status = 'active'"
@@ -151,7 +163,7 @@ python scripts/generate_duckdb_test_data.py \
 And then:
 
 ```
-tablediff users_dev users_prod --pk id --conn duckdb://./sample.duckdb
+tablediff compare users_dev users_prod --pk id --conn duckdb://./sample.duckdb
 ```
 
 # Future roadmap
@@ -159,7 +171,7 @@ tablediff users_dev users_prod --pk id --conn duckdb://./sample.duckdb
 - [x] WHERE conditions
 - [x] Add tests
 - [x] Cross-database comparison
-- [ ] Schema-only comparison (with data types)
+- [x] Schema-only comparison (with data types)
 - [ ] Column-by-column comparison (# of rows that are different)
 - [ ] Add pre-commit hooks (check vesion bump?)
 - [ ] Add dbt support

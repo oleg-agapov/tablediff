@@ -6,7 +6,6 @@ Tests the CLI argument parsing and connection string handling for:
 - Cross-database connections (--conn and --conn2)
 """
 
-import pytest
 from unittest.mock import patch, MagicMock
 from tablediff.cli import build_parser, main
 
@@ -18,11 +17,13 @@ class TestCLIArguments:
         """Test that parser accepts --conn argument."""
         parser = build_parser()
         args = parser.parse_args([
+            "compare",
             "table_a", "table_b",
             "--pk", "id",
             "--conn", "duckdb://./db.duckdb"
         ])
         
+        assert args.command == "compare"
         assert args.conn == "duckdb://./db.duckdb"
         assert args.conn2 is None
     
@@ -30,38 +31,27 @@ class TestCLIArguments:
         """Test that parser accepts --conn and --conn2 arguments."""
         parser = build_parser()
         args = parser.parse_args([
+            "compare",
             "table_a", "table_b",
             "--pk", "id",
             "--conn", "duckdb://./db_a.duckdb",
             "--conn2", "duckdb://./db_b.duckdb"
         ])
         
+        assert args.command == "compare"
         assert args.conn == "duckdb://./db_a.duckdb"
         assert args.conn2 == "duckdb://./db_b.duckdb"
     
-    def test_parser_accepts_schema_only(self):
-        """Test that parser accepts --schema-only argument."""
+    def test_parser_accepts_schema_command(self):
+        """Test that parser accepts schema command."""
         parser = build_parser()
         args = parser.parse_args([
+            "schema",
             "table_a", "table_b",
-            "--conn", "duckdb://./db.duckdb",
-            "--schema-only"
+            "--conn", "duckdb://./db.duckdb"
         ])
         
-        assert args.schema_only is True
-    
-    def test_parser_schema_only_without_pk(self):
-        """Test that parser accepts --schema-only without --pk."""
-        parser = build_parser()
-        args = parser.parse_args([
-            "table_a", "table_b",
-            "--conn", "duckdb://./db.duckdb",
-            "--schema-only"
-        ])
-        
-        # Should not raise an error
-        assert args.schema_only is True
-        assert args.pk is None
+        assert args.command == "schema"
 
 
 class TestCLIConnectionLogic:
@@ -75,6 +65,7 @@ class TestCLIConnectionLogic:
         
         with patch('sys.argv', [
             'tablediff',
+            'compare',
             'table_a', 'table_b',
             '--pk', 'id',
             '--conn', 'duckdb://./db.duckdb'
@@ -99,6 +90,7 @@ class TestCLIConnectionLogic:
         
         with patch('sys.argv', [
             'tablediff',
+            'compare',
             'table_a', 'table_b',
             '--pk', 'id',
             '--conn', 'duckdb://./db_a.duckdb',
@@ -128,6 +120,7 @@ class TestCLIConnectionLogic:
         
         with patch('sys.argv', [
             'tablediff',
+            'compare',
             'table_a', 'table_b',
             '--pk', 'id',
             '--conn', 'duckdb://./db_a.duckdb',
@@ -151,6 +144,7 @@ class TestCLIConnectionLogic:
         
         with patch('sys.argv', [
             'tablediff',
+            'compare',
             'table_a', 'table_b',
             '--pk', 'id',
             '--conn', 'duckdb://./db_a.duckdb',
@@ -171,15 +165,15 @@ class TestCLIConnectionLogic:
     
     @patch('tablediff.cli.schema_diff')
     @patch('tablediff.cli.render_schema_diff')
-    def test_main_schema_only_flag(self, mock_render, mock_schema_diff):
-        """Test that --schema-only flag calls schema_diff instead of table_diff."""
+    def test_main_schema_command(self, mock_render, mock_schema_diff):
+        """Test that schema command calls schema_diff instead of table_diff."""
         mock_schema_diff.return_value = MagicMock()
         
         with patch('sys.argv', [
             'tablediff',
+            'schema',
             'table_a', 'table_b',
-            '--conn', 'duckdb://./db.duckdb',
-            '--schema-only'
+            '--conn', 'duckdb://./db.duckdb'
         ]):
             main()
         
@@ -194,16 +188,16 @@ class TestCLIConnectionLogic:
     
     @patch('tablediff.cli.schema_diff')
     @patch('tablediff.cli.render_schema_diff')
-    def test_main_schema_only_with_cross_db(self, mock_render, mock_schema_diff):
-        """Test that --schema-only works with cross-database comparison."""
+    def test_main_schema_with_cross_db(self, mock_render, mock_schema_diff):
+        """Test that schema command works with cross-database comparison."""
         mock_schema_diff.return_value = MagicMock()
         
         with patch('sys.argv', [
             'tablediff',
+            'schema',
             'table_a', 'table_b',
             '--conn', 'duckdb://./db_a.duckdb',
-            '--conn2', 'duckdb://./db_b.duckdb',
-            '--schema-only'
+            '--conn2', 'duckdb://./db_b.duckdb'
         ]):
             main()
         
@@ -227,9 +221,9 @@ class TestCLIConnectionLogic:
         with patch('tablediff.cli.os.path.exists', return_value=True):
             with patch('sys.argv', [
                 'tablediff',
+                'files',
                 '/tmp/customers.csv', '/tmp/orders.csv',
                 '--pk', 'id',
-                '--csv'
             ]):
                 main()
 
@@ -259,9 +253,9 @@ class TestCLIConnectionLogic:
         with patch('tablediff.cli.os.path.exists', return_value=True):
             with patch('sys.argv', [
                 'tablediff',
+                'files',
                 '/tmp/data.csv', '/var/data.csv',
                 '--pk', 'id',
-                '--csv'
             ]):
                 main()
 
@@ -291,9 +285,9 @@ class TestCLIConnectionLogic:
         with patch('tablediff.cli.os.path.exists', return_value=True):
             with patch('sys.argv', [
                 'tablediff',
+                'files',
                 '/tmp/sales report-2024.csv', '/tmp/shipments-2024.csv',
                 '--pk', 'id',
-                '--csv'
             ]):
                 main()
 
