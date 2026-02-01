@@ -215,3 +215,99 @@ class TestCLIConnectionLogic:
             'table_b'
         )
         mock_render.assert_called_once()
+
+    @patch('tablediff.cli.load_csv_to_duckdb')
+    @patch('tablediff.cli.table_diff')
+    @patch('tablediff.cli.render_summary_table')
+    def test_main_csv_mode_uses_file_names(self, mock_render, mock_table_diff, mock_load_csv):
+        """Test that CSV mode uses file names (without extensions) as table names."""
+        mock_table_diff.return_value = MagicMock()
+        mock_load_csv.return_value = ("duckdb:///tmp/csv.duckdb", "/tmp/csv.duckdb")
+
+        with patch('tablediff.cli.os.path.exists', return_value=True):
+            with patch('sys.argv', [
+                'tablediff',
+                '/tmp/customers.csv', '/tmp/orders.csv',
+                '--pk', 'id',
+                '--csv'
+            ]):
+                main()
+
+        mock_load_csv.assert_called_once_with(
+            '/tmp/customers.csv',
+            '/tmp/orders.csv',
+            table_name_a='customers_csv',
+            table_name_b='orders_csv'
+        )
+        mock_table_diff.assert_called_once_with(
+            'duckdb:///tmp/csv.duckdb',
+            'duckdb:///tmp/csv.duckdb',
+            'customers_csv',
+            'orders_csv',
+            'id',
+            where=None
+        )
+
+    @patch('tablediff.cli.load_csv_to_duckdb')
+    @patch('tablediff.cli.table_diff')
+    @patch('tablediff.cli.render_summary_table')
+    def test_main_csv_mode_same_file_names_add_suffixes(self, mock_render, mock_table_diff, mock_load_csv):
+        """Test that CSV mode adds suffixes when file names match."""
+        mock_table_diff.return_value = MagicMock()
+        mock_load_csv.return_value = ("duckdb:///tmp/csv.duckdb", "/tmp/csv.duckdb")
+
+        with patch('tablediff.cli.os.path.exists', return_value=True):
+            with patch('sys.argv', [
+                'tablediff',
+                '/tmp/data.csv', '/var/data.csv',
+                '--pk', 'id',
+                '--csv'
+            ]):
+                main()
+
+        mock_load_csv.assert_called_once_with(
+            '/tmp/data.csv',
+            '/var/data.csv',
+            table_name_a='data_csv_1',
+            table_name_b='data_csv_2'
+        )
+        mock_table_diff.assert_called_once_with(
+            'duckdb:///tmp/csv.duckdb',
+            'duckdb:///tmp/csv.duckdb',
+            'data_csv_1',
+            'data_csv_2',
+            'id',
+            where=None
+        )
+
+    @patch('tablediff.cli.load_csv_to_duckdb')
+    @patch('tablediff.cli.table_diff')
+    @patch('tablediff.cli.render_summary_table')
+    def test_main_csv_mode_sanitizes_spaces_and_dashes(self, mock_render, mock_table_diff, mock_load_csv):
+        """Test that CSV mode replaces spaces and dashes with underscores."""
+        mock_table_diff.return_value = MagicMock()
+        mock_load_csv.return_value = ("duckdb:///tmp/csv.duckdb", "/tmp/csv.duckdb")
+
+        with patch('tablediff.cli.os.path.exists', return_value=True):
+            with patch('sys.argv', [
+                'tablediff',
+                '/tmp/sales report-2024.csv', '/tmp/shipments-2024.csv',
+                '--pk', 'id',
+                '--csv'
+            ]):
+                main()
+
+        mock_load_csv.assert_called_once_with(
+            '/tmp/sales report-2024.csv',
+            '/tmp/shipments-2024.csv',
+            table_name_a='sales_report_2024_csv',
+            table_name_b='shipments_2024_csv'
+        )
+        mock_table_diff.assert_called_once_with(
+            'duckdb:///tmp/csv.duckdb',
+            'duckdb:///tmp/csv.duckdb',
+            'sales_report_2024_csv',
+            'shipments_2024_csv',
+            'id',
+            where=None
+        )

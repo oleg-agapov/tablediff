@@ -134,15 +134,20 @@ class TestCSVCLI:
             main()
         
         # Verify load_csv_to_duckdb was called with correct paths
-        mock_load_csv.assert_called_once_with(csv_a, csv_b)
+        mock_load_csv.assert_called_once_with(
+            csv_a,
+            csv_b,
+            table_name_a="table_a_csv",
+            table_name_b="table_b_csv",
+        )
         
         # Verify table_diff was called with the temporary database
         mock_table_diff.assert_called_once()
         call_args = mock_table_diff.call_args
         assert call_args[0][0] == "duckdb:///tmp/test.duckdb"  # conn_a
         assert call_args[0][1] == "duckdb:///tmp/test.duckdb"  # conn_b
-        assert call_args[0][2] == "table_a"  # table_a_name
-        assert call_args[0][3] == "table_b"  # table_b_name
+        assert call_args[0][2] == "table_a_csv"  # table_a_name
+        assert call_args[0][3] == "table_b_csv"  # table_b_name
         assert call_args[0][4] == "id"  # primary key
     
     def test_main_csv_mode_file_not_found(self):
@@ -201,8 +206,8 @@ class TestCSVCLI:
         mock_schema_diff.assert_called_once_with(
             "duckdb:///tmp/test.duckdb",
             "duckdb:///tmp/test.duckdb",
-            "table_a",
-            "table_b"
+            "table_a_csv",
+            "table_b_csv"
         )
 
 

@@ -27,6 +27,25 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _sanitize_table_name(name: str, fallback: str) -> str:
+    sanitized = "".join(ch if (ch.isalnum() or ch == "_") else "_" for ch in name)
+    if not sanitized:
+        sanitized = fallback
+    if not (sanitized[0].isalpha() or sanitized[0] == "_"):
+        sanitized = f"{fallback}_{sanitized}"
+    return sanitized
+
+
+def _derive_csv_table_names(csv_path_a: str, csv_path_b: str) -> tuple[str, str]:
+    base_a = os.path.basename(csv_path_a)
+    base_b = os.path.basename(csv_path_b)
+    name_a = _sanitize_table_name(base_a, "table_a")
+    name_b = _sanitize_table_name(base_b, "table_b")
+    if name_a == name_b:
+        return f"{name_a}_1", f"{name_b}_2"
+    return name_a, name_b
+
+
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
@@ -49,11 +68,15 @@ def main() -> None:
             parser.error(f"CSV file not found: {csv_path_b}")
         
         # Load CSV files into temporary DuckDB database
-        conn_str, temp_db_path = load_csv_to_duckdb(csv_path_a, csv_path_b)
+        table_a_name, table_b_name = _derive_csv_table_names(csv_path_a, csv_path_b)
+        conn_str, temp_db_path = load_csv_to_duckdb(
+            csv_path_a,
+            csv_path_b,
+            table_name_a=table_a_name,
+            table_name_b=table_b_name,
+        )
         conn_a = conn_str
         conn_b = conn_str
-        table_a_name = "table_a"
-        table_b_name = "table_b"
     else:
         # Determine connection strings for each table
         # --conn is used for table_a (and table_b if --conn2 is not provided)
