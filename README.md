@@ -8,12 +8,21 @@ CLI tool for data diffing between two tables:
 
 The package is available in PyPi and can be installed by specifying the package name and the adapter for your database.
 
-Currently it was tested with DuckDB and Snowflake, but technically should support all adapters that [reladiff supports](https://reladiff.readthedocs.io/en/latest/supported-databases.html):
+Currently it was tested with DuckDB and Snowflake, but should work with all adapters that [reladiff supports](https://reladiff.readthedocs.io/en/latest/supported-databases.html):
 
-| Adapter   | Command                                      |
-|-----------|----------------------------------------------|
-| DuckDB    | ``` pip install tablediff-cli[duckdb] ```    |
-| Snowflake | ``` pip install tablediff-cli[snowflake] ``` |
+| Adapter    | Command                                       |
+|------------|-----------------------------------------------|
+| DuckDB     | ``` pip install tablediff-cli ```             |
+| Snowflake  | ``` pip install tablediff-cli[snowflake] ```  |
+| MySQL      | ``` pip install tablediff-cli[mysql] ```      |
+| PostgreSQL | ``` pip install tablediff-cli[postgresql] ``` |
+| BigQuery   | ``` pip install tablediff-cli[bigquery] ```   |
+| Clickhouse | ``` pip install tablediff-cli[clickhouse] ``` |
+| Presto     | ``` pip install tablediff-cli[presto] ```     |
+| Oracle     | ``` pip install tablediff-cli[oracle] ```     |
+| Trino      | ``` pip install tablediff-cli[trino] ```      |
+| Vertica    | ``` pip install tablediff-cli[vertica] ```    |
+
 
 To install all available adapters try:
 
@@ -28,24 +37,34 @@ Requires Python 3.10+. Technically can be downported to earlier versions, let me
 Once installed, use command-line to run the diffing process:
 
 ```
-tablediff compare TABLE_A TABLE_B --pk PRIMARY_KEY --conn CONNECTION_STRING [OPTIONS]
+tablediff compare \
+  TABLE_A \
+  TABLE_B \
+  --pk PRIMARY_KEY \
+  --conn CONNECTION_STRING [OPTIONS]
 ```
 
 - tables should be in format `table_name` or `schema.table_name` or `database.schema.table_name`
   - for Snowflake use all identifiers in UPPERCASE
 - `--pk` is the primary key column (should exist in both tables)
-- `--conn` is the database connection string for table_a (or both tables if `--conn2` is not provided)
+- `--conn` is the database connection string
 
 Schema-only comparison:
 
 ```
-tablediff schema TABLE_A TABLE_B --conn CONNECTION_STRING [--conn2 CONNECTION_STRING]
+tablediff schema \
+  TABLE_A \
+  TABLE_B \
+  --conn CONNECTION_STRING [--conn2 CONNECTION_STRING]
 ```
 
-CSV comparison:
+CSV comparison (same options as for `compare`):
 
 ```
-tablediff files FILE_A FILE_B --pk PRIMARY_KEY [OPTIONS]
+tablediff files \
+  FILE_A \
+  FILE_B \
+  --pk PRIMARY_KEY [OPTIONS]
 ```
 
 ### Cross-Database Comparison
@@ -53,11 +72,18 @@ tablediff files FILE_A FILE_B --pk PRIMARY_KEY [OPTIONS]
 You can compare tables across different databases using `--conn` and `--conn2`:
 
 ```
-tablediff compare TABLE_A TABLE_B --pk PRIMARY_KEY --conn CONNECTION_A --conn2 CONNECTION_B [OPTIONS]
+tablediff compare \
+  TABLE_A \
+  TABLE_B \
+  --pk PRIMARY_KEY \
+  --conn CONNECTION_A \
+  --conn2 CONNECTION_B [OPTIONS]
 ```
 
-- `--conn` - connection string for TABLE_A (and TABLE_B if `--conn2` not provided)
-- `--conn2` - connection string for TABLE_B (when comparing across different databases)
+- `--conn` - connection string for TABLE_A
+- `--conn2` - connection string for TABLE_B
+
+### Connection strings
 
 Here are a could of examples of connection strings:
 
@@ -78,7 +104,9 @@ For other databases check [docs for reladiff](https://reladiff.readthedocs.io/en
 Diffing in DuckDB (same database):
 
 ```
-tablediff compare users_prod users_dev --pk id --conn duckdb://./sample.duckdb
+tablediff compare \
+  users_prod users_dev \
+  --pk id --conn duckdb://./sample.duckdb
 ```
 
 Diffing across two DuckDB databases:
@@ -106,7 +134,7 @@ tablediff compare PROD.MART.USERS local_users \
   --conn2 duckdb://./local.duckdb
 ```
 
-## Additional flags
+## Additional options
 
 ### --extended
 If you pass `--extended` flag you'll get an extended output that will show you:
