@@ -1,5 +1,6 @@
 from rich import box
 from rich.console import Console
+from rich.columns import Columns
 from rich.panel import Panel
 from rich.table import Table
 
@@ -125,6 +126,44 @@ def render_extended_table(result: DiffResult) -> None:
     )
 
     console.print(Panel.fit(table, padding=(1, 2), title="🕵️‍♀️ Extended info"))
+    console.print()
+
+
+def render_id_samples(result: DiffResult, limit: int = 5) -> None:
+    def _render_key(key: object) -> str:
+        if isinstance(key, tuple):
+            if len(key) == 1:
+                return repr(key[0])
+            return repr(list(key))
+        if isinstance(key, list):
+            if len(key) == 1:
+                return repr(key[0])
+            return repr(key)
+        return repr(key)
+
+    def _render_table(title: str, keys: list[object]) -> Panel:
+        table = Table(show_header=True, box=box.MINIMAL, padding=(0, 2))
+        table.add_column(str(result.primary_key), style="bold")
+        if not keys:
+            table.add_row("No rows")
+        else:
+            for key in keys[:limit]:
+                table.add_row(_render_key(key))
+        return Panel.fit(table, padding=(1, 2), title=title)
+
+    console = Console()
+    console.print()
+
+    rows_in_both_diff = result.diff_by_sign.get("!", [])
+    rows_only_in_a = result.diff_by_sign.get("-", [])
+    rows_only_in_b = result.diff_by_sign.get("+", [])
+
+    panels = [
+        _render_table(f"Rows only in {result.table_a.name} — top {limit}", rows_only_in_a),
+        _render_table(f"Rows in both (diff) — top {limit}", rows_in_both_diff),
+        _render_table(f"Rows only in {result.table_b.name} — top {limit}", rows_only_in_b),
+    ]
+    console.print(Columns(panels, equal=False, expand=False))
     console.print()
 
 

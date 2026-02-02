@@ -4,7 +4,7 @@ import argparse
 import os
 
 from tablediff.engine import load_csv_to_duckdb, schema_diff, table_diff
-from tablediff.renderers import render_extended_table, render_schema_diff, render_summary_table
+from tablediff.renderers import render_schema_diff, render_summary_table, render_id_samples
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -91,7 +91,7 @@ def main() -> None:
             results = table_diff(conn_a, conn_b, table_a_name, table_b_name, args.pk, where=args.where)
             render_summary_table(results)
             if args.extended:
-                render_extended_table(results)
+                render_id_samples(results)
                 schema_result = schema_diff(conn_a, conn_b, table_a_name, table_b_name)
                 render_schema_diff(schema_result)
         elif args.command == "schema":
@@ -124,7 +124,7 @@ def main() -> None:
             results = table_diff(conn_a, conn_b, table_a_name, table_b_name, args.pk, where=args.where)
             render_summary_table(results)
             if args.extended:
-                render_extended_table(results)
+                render_id_samples(results)
                 schema_result = schema_diff(conn_a, conn_b, table_a_name, table_b_name)
                 render_schema_diff(schema_result)
         else:
