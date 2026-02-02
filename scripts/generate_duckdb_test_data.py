@@ -35,12 +35,7 @@ def load_sql(
     dev_null_status_rows: int | None,
 ) -> str:
     sql = sql_path.read_text(encoding="utf-8")
-    if (
-        prod_rows is None
-        and dev_remove_rows is None
-        and dev_add_rows is None
-        and dev_null_status_rows is None
-    ):
+    if prod_rows is None and dev_remove_rows is None and dev_add_rows is None and dev_null_status_rows is None:
         return sql
 
     defaults = PARAMS_BLOCK_RE.search(sql)

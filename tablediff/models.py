@@ -1,12 +1,16 @@
 from __future__ import annotations
+
 from dataclasses import dataclass
+
 from reladiff.diff_tables import DiffResultWrapper
+
 
 @dataclass(frozen=True)
 class TableMeta:
     name: str
     columns: list[str]
     rows: int
+
 
 @dataclass(frozen=True)
 class DiffResult:
@@ -21,6 +25,7 @@ class DiffResult:
     diff_by_keys: dict
     diff_by_sign: dict
     diffing: DiffResultWrapper
+
 
 @dataclass(frozen=True)
 class SchemaDiffResult:

@@ -1,6 +1,7 @@
 .*
 !/.gitignore
 !/.github
+!/.pre-commit-config.yaml
 
 __pycache__/
 *.py[cod]

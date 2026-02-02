@@ -88,13 +88,13 @@ tablediff compare \
 Here are a could of examples of connection strings:
 
 - DuckDB
-  ``` 
+  ```
   duckdb://<file_path>
   ```
 
 - Snowflake
   ```
-  "snowflake://<user>[:<password>]@<account>/<database>/<SCHEMA>?warehouse=<WAREHOUSE>&role=<role>[&authenticator=externalbrowser]" 
+  "snowflake://<user>[:<password>]@<account>/<database>/<SCHEMA>?warehouse=<WAREHOUSE>&role=<role>[&authenticator=externalbrowser]"
   ```
 
 For other databases check [docs for reladiff](https://reladiff.readthedocs.io/en/latest/supported-databases.html).
