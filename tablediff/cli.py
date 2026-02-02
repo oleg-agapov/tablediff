@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import argparse
 import os
-from tablediff.engine import table_diff, schema_diff, load_csv_to_duckdb
-from tablediff.renderers import render_summary_table, render_extended_table, render_schema_diff
+
+from tablediff.engine import load_csv_to_duckdb, schema_diff, table_diff
+from tablediff.renderers import render_extended_table, render_schema_diff, render_summary_table
+
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -13,10 +15,16 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     def add_conn_args(subparser: argparse.ArgumentParser) -> None:
-        subparser.add_argument("--conn", help="Database connection string for table_a (or both tables if --conn2 not provided).")
-        subparser.add_argument("--conn2", help="Database connection string for table_b (when comparing across different databases).")
+        subparser.add_argument(
+            "--conn", help="Database connection string for table_a (or both tables if --conn2 not provided)."
+        )
+        subparser.add_argument(
+            "--conn2", help="Database connection string for table_b (when comparing across different databases)."
+        )
         subparser.add_argument("--dbt-profile-path", default="profiles.yml", help="Path to dbt profiles file.")
-        subparser.add_argument("--dbt-profile", default="dbt_analytics", help="Profile name inside the profiles.yml file.")
+        subparser.add_argument(
+            "--dbt-profile", default="dbt_analytics", help="Profile name inside the profiles.yml file."
+        )
         subparser.add_argument("--dbt-target", default="dev", help="Target name defined in the dbt profile.")
         subparser.add_argument("--env-file", default=".env", help="Path to a .env file that stores credential values.")
 
@@ -26,7 +34,9 @@ def build_parser() -> argparse.ArgumentParser:
     compare_parser.add_argument("--pk", required=True, help="Primary key column name.")
     add_conn_args(compare_parser)
     compare_parser.add_argument("--extended", action="store_true", help="Enable extended output")
-    compare_parser.add_argument("--where", help="SQL WHERE clause to filter rows before comparison (e.g., \"status = 'active'\")")
+    compare_parser.add_argument(
+        "--where", help="SQL WHERE clause to filter rows before comparison (e.g., \"status = 'active'\")"
+    )
 
     schema_parser = subparsers.add_parser("schema", help="Compare schemas (data types) without comparing data.")
     schema_parser.add_argument("table_a", help="First table name.")
@@ -38,7 +48,9 @@ def build_parser() -> argparse.ArgumentParser:
     files_parser.add_argument("file_b", help="Second CSV file path.")
     files_parser.add_argument("--pk", required=True, help="Primary key column name.")
     files_parser.add_argument("--extended", action="store_true", help="Enable extended output")
-    files_parser.add_argument("--where", help="SQL WHERE clause to filter rows before comparison (e.g., \"status = 'active'\")")
+    files_parser.add_argument(
+        "--where", help="SQL WHERE clause to filter rows before comparison (e.g., \"status = 'active'\")"
+    )
     return parser
 
 
@@ -122,6 +134,6 @@ def main() -> None:
         if temp_db_path and os.path.exists(temp_db_path):
             try:
                 os.unlink(temp_db_path)
-            except (FileNotFoundError, PermissionError, OSError) as e:
+            except (FileNotFoundError, PermissionError, OSError):
                 # Ignore cleanup errors - the file will be cleaned up by the OS eventually
                 pass
