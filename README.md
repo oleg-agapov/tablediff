@@ -170,8 +170,17 @@ Now setup the local environment (I'm using uv):
 uv sync --extra dev
 source .venv/bin/activate
 
+# Install pre-commit hooks
+pre-commit install
+
 # Run tests
 pytest
+```
+
+Pre-commit hooks are configured to run automatically on every commit. To run them manually on all files:
+
+```bash
+pre-commit run --all-files
 ```
 
 ## Generating sample DuckDB for local testing
@@ -200,6 +209,6 @@ tablediff compare users_dev users_prod --pk id --conn duckdb://./sample.duckdb
 - [x] Add tests
 - [x] Cross-database comparison
 - [x] Schema-only comparison (with data types)
+- [x] Add pre-commit hooks
 - [ ] Column-by-column comparison (# of rows that are different)
-- [ ] Add pre-commit hooks (check vesion bump?)
 - [ ] Add dbt support
