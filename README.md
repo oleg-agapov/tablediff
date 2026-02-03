@@ -2,7 +2,7 @@
 
 CLI tool for data diffing between two tables:
 
-![Demo gif](./img/screenshot2.png)
+![Screenshot](https://raw.githubusercontent.com/oleg-agapov/tablediff/refs/heads/main/img/screenshot2.png)
 
 ## Installation
 
