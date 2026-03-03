@@ -1,6 +1,5 @@
 from rich import box
 from rich.console import Console
-from rich.columns import Columns
 from rich.panel import Panel
 from rich.table import Table
 
@@ -141,7 +140,18 @@ def render_id_samples(result: DiffResult, limit: int = 5) -> None:
             return repr(key)
         return repr(key)
 
-    def _render_table(title: str, keys: list[object]) -> Panel:
+    def _sql_value(key: object) -> str:
+        if isinstance(key, (tuple, list)):
+            if len(key) == 1:
+                return repr(key[0])
+            return "(" + ", ".join(repr(v) for v in key) + ")"
+        return repr(key)
+
+    def _build_sql(table_name: str, keys: list[object]) -> str:
+        values = ", ".join(_sql_value(k) for k in keys[:limit])
+        return f"SELECT * FROM {table_name} WHERE {result.primary_key} IN ({values})"
+
+    def _render_panel(title: str, keys: list[object]) -> Panel:
         table = Table(show_header=True, box=box.MINIMAL, padding=(0, 2))
         table.add_column(str(result.primary_key), style="bold")
         if not keys:
@@ -158,12 +168,19 @@ def render_id_samples(result: DiffResult, limit: int = 5) -> None:
     rows_only_in_a = result.diff_by_sign.get("-", [])
     rows_only_in_b = result.diff_by_sign.get("+", [])
 
-    panels = [
-        _render_table(f"Rows only in {result.table_a.name} — top {limit}", rows_only_in_a),
-        _render_table(f"Rows in both (diff) — top {limit}", rows_in_both_diff),
-        _render_table(f"Rows only in {result.table_b.name} — top {limit}", rows_only_in_b),
-    ]
-    console.print(Columns(panels, equal=False, expand=False))
+    console.print(_render_panel(f"Rows only in {result.table_a.name} — top {limit}", rows_only_in_a))
+    if rows_only_in_a:
+        console.print(_build_sql(result.table_a.name, rows_only_in_a))
+
+    console.print(_render_panel(f"Rows in both (diff) — top {limit}", rows_in_both_diff))
+    if rows_in_both_diff:
+        console.print(_build_sql(result.table_a.name, rows_in_both_diff))
+        console.print(_build_sql(result.table_b.name, rows_in_both_diff))
+
+    console.print(_render_panel(f"Rows only in {result.table_b.name} — top {limit}", rows_only_in_b))
+    if rows_only_in_b:
+        console.print(_build_sql(result.table_b.name, rows_only_in_b))
+
     console.print()
 
 
