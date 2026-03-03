@@ -180,21 +180,26 @@ def render_id_samples(result: DiffResult, limit: int = 5) -> None:
     rows_only_in_a = result.diff_by_sign.get("-", [])
     rows_only_in_b = result.diff_by_sign.get("+", [])
 
-    console.print(
-        _render_panel(f"Rows only in {result.table_a.name} — top {limit}", rows_only_in_a, [result.table_a.name])
-    )
-
-    console.print(
-        _render_panel(
-            f"Rows in both (diff) — top {limit}",
-            rows_in_both_diff,
-            [result.table_a.name, result.table_b.name],
+    if rows_only_in_a:
+        console.print(
+            _render_panel(f"Rows only in {result.table_a.name} — top {limit}", rows_only_in_a, [result.table_a.name])
         )
-    )
 
-    console.print(
-        _render_panel(f"Rows only in {result.table_b.name} — top {limit}", rows_only_in_b, [result.table_b.name])
-    )
+    if rows_in_both_diff:
+        console.print(
+            _render_panel(
+                f"Rows in both (diff) — top {limit}",
+                rows_in_both_diff,
+                [result.table_a.name, result.table_b.name],
+            )
+        )
+
+    if rows_only_in_b:
+        console.print(
+            _render_panel(
+                f"Rows only in {result.table_b.name} — top {limit}", rows_only_in_b, [result.table_b.name]
+            )
+        )
 
     console.print()
 
