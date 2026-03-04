@@ -111,11 +111,11 @@ class TestCLIConnectionLogic:
 
     @patch("tablediff.cli.table_diff")
     @patch("tablediff.cli.render_summary_table")
-    @patch("tablediff.cli.render_extended_table")
+    @patch("tablediff.cli.render_id_samples")
     @patch("tablediff.cli.schema_diff")
     @patch("tablediff.cli.render_schema_diff")
     def test_main_extended_flag_works_with_cross_db(
-        self, mock_schema_render, mock_schema_diff, mock_ext, mock_summary, mock_table_diff
+        self, mock_schema_render, mock_schema_diff, mock_id_samples, mock_summary, mock_table_diff
     ):
         """Test that --extended flag works with cross-database comparison."""
         mock_table_diff.return_value = MagicMock()
@@ -141,7 +141,7 @@ class TestCLIConnectionLogic:
 
         # Verify extended output is rendered
         mock_summary.assert_called_once()
-        mock_ext.assert_called_once()
+        mock_id_samples.assert_called_once()
         # Verify schema comparison is also rendered in extended mode
         mock_schema_diff.assert_called_once()
         mock_schema_render.assert_called_once()
