@@ -4,7 +4,7 @@ import argparse
 import os
 
 from tablediff.engine import load_csv_to_duckdb, schema_diff, table_diff
-from tablediff.renderers import render_id_samples, render_schema_diff, render_summary_table
+from tablediff.renderers import render_schema_diff, render_summary_table, render_id_samples
 
 
 def build_parser() -> argparse.ArgumentParser:
